@@ -1,0 +1,134 @@
+{
+  "id": "warzone_arena",
+  "name": "Warzone Arena",
+  "description": "Geniş açık alan, insanlar için avantajlı. Orta köprü kontrol noktası belirleyici.",
+  "thumbnail": "assets/maps/thumbs/warzone_arena.png",
+  "modes": ["tdm", "ctf"],
+  "width": 4800,
+  "height": 800,
+  "background": "bg_city_night",
+  "music": "music_warzone",
+
+  "spawns": {
+    "red":  [
+      {"x": 80,  "y": 712}, {"x": 160, "y": 712}, {"x": 240, "y": 712},
+      {"x": 100, "y": 592}, {"x": 200, "y": 592}
+    ],
+    "blue": [
+      {"x": 4560,"y": 712}, {"x": 4640,"y": 712}, {"x": 4720,"y": 712},
+      {"x": 4580,"y": 592}, {"x": 4660,"y": 592}
+    ]
+  },
+
+  "ctf_flags": {
+    "red":  {"x": 80,   "y": 712, "baseX": 80,   "baseY": 712},
+    "blue": {"x": 4688, "y": 712, "baseX": 4688, "baseY": 712}
+  },
+
+  "platforms": [
+    {"x": 0,    "y": 760, "w": 4800, "h": 40, "type": "solid"},
+    {"x": 100,  "y": 620, "w": 220,  "h": 20, "type": "solid"},
+    {"x": 360,  "y": 520, "w": 180,  "h": 20, "type": "solid"},
+    {"x": 560,  "y": 420, "w": 160,  "h": 20, "type": "solid"},
+    {"x": 200,  "y": 380, "w": 140,  "h": 20, "type": "solid"},
+    {"x": 450,  "y": 290, "w": 130,  "h": 20, "type": "solid"},
+    {"x": 700,  "y": 460, "w": 200,  "h": 20, "type": "solid"},
+    {"x": 820,  "y": 340, "w": 150,  "h": 20, "type": "solid"},
+    {"x": 100,  "y": 230, "w": 200,  "h": 20, "type": "solid"},
+    {"x": 1050, "y": 580, "w": 240,  "h": 20, "type": "solid"},
+    {"x": 1180, "y": 460, "w": 200,  "h": 20, "type": "solid"},
+    {"x": 1050, "y": 340, "w": 160,  "h": 20, "type": "solid"},
+    {"x": 1300, "y": 260, "w": 180,  "h": 20, "type": "solid"},
+    {"x": 1520, "y": 480, "w": 240,  "h": 20, "type": "solid"},
+    {"x": 1600, "y": 360, "w": 160,  "h": 20, "type": "solid"},
+    {"x": 1900, "y": 680, "w": 1000, "h": 20, "type": "solid"},
+    {"x": 2050, "y": 560, "w": 700,  "h": 20, "type": "solid"},
+    {"x": 2200, "y": 440, "w": 400,  "h": 20, "type": "solid"},
+    {"x": 2300, "y": 320, "w": 200,  "h": 20, "type": "solid"},
+    {"x": 3050, "y": 480, "w": 240,  "h": 20, "type": "solid"},
+    {"x": 3080, "y": 360, "w": 160,  "h": 20, "type": "solid"},
+    {"x": 3480, "y": 480, "w": 240,  "h": 20, "type": "solid"},
+    {"x": 3700, "y": 460, "w": 200,  "h": 20, "type": "solid"},
+    {"x": 3950, "y": 620, "w": 220,  "h": 20, "type": "solid"},
+    {"x": 4100, "y": 520, "w": 180,  "h": 20, "type": "solid"},
+    {"x": 4200, "y": 380, "w": 140,  "h": 20, "type": "solid"},
+    {"x": 4500, "y": 230, "w": 200,  "h": 20, "type": "solid"}
+  ],
+
+  "wall_jump_zones": [
+    {"x": 0,    "y": 0, "w": 20,  "h": 800, "side": "right"},
+    {"x": 4780, "y": 0, "w": 20,  "h": 800, "side": "left"},
+    {"x": 1900, "y": 200,"w": 20, "h": 400, "side": "right"},
+    {"x": 2880, "y": 200,"w": 20, "h": 400, "side": "left"}
+  ],
+
+  "climb_surfaces": [
+    {"x": 0,    "y": 200, "w": 20, "h": 560},
+    {"x": 4780, "y": 200, "w": 20, "h": 560},
+    {"x": 1898, "y": 300, "w": 4,  "h": 380},
+    {"x": 2878, "y": 300, "w": 4,  "h": 380}
+  ],
+
+  "special_zones": [
+    {
+      "id": "center_high_ground",
+      "type": "high_ground",
+      "x": 2200, "y": 300, "w": 400, "h": 150,
+      "effect": "vision_bonus",
+      "desc": "Orta yüksek zemin — tüm alanı gözetler"
+    },
+    {
+      "id": "red_base_zone",
+      "type": "base",
+      "x": 0, "y": 600, "w": 300, "h": 200,
+      "team": "red"
+    },
+    {
+      "id": "blue_base_zone",
+      "type": "base",
+      "x": 4500, "y": 600, "w": 300, "h": 200,
+      "team": "blue"
+    }
+  ],
+
+  "interactive_objects": [
+    {
+      "id": "barrel_1", "type": "explosive_barrel",
+      "x": 1920, "y": 650, "w": 32, "h": 48,
+      "hp": 40, "explosion_radius": 120, "explosion_damage": 60,
+      "respawn_time": 30.0
+    },
+    {
+      "id": "barrel_2", "type": "explosive_barrel",
+      "x": 2820, "y": 650, "w": 32, "h": 48,
+      "hp": 40, "explosion_radius": 120, "explosion_damage": 60,
+      "respawn_time": 30.0
+    },
+    {
+      "id": "glass_1", "type": "breakable_glass",
+      "x": 1100, "y": 340, "w": 160, "h": 12,
+      "hp": 20, "respawn_time": 20.0,
+      "desc": "Kırılınca geçiş açılır"
+    },
+    {
+      "id": "glass_2", "type": "breakable_glass",
+      "x": 3600, "y": 340, "w": 160, "h": 12,
+      "hp": 20, "respawn_time": 20.0
+    },
+    {
+      "id": "ammo_box_center", "type": "ammo_box",
+      "x": 2380, "y": 300, "w": 28, "h": 28,
+      "refill": 1.0, "respawn_time": 15.0
+    },
+    {
+      "id": "health_pack_left", "type": "health_pack",
+      "x": 700, "y": 432, "w": 24, "h": 24,
+      "heal": 30, "respawn_time": 20.0
+    },
+    {
+      "id": "health_pack_right", "type": "health_pack",
+      "x": 4050, "y": 432, "w": 24, "h": 24,
+      "heal": 30, "respawn_time": 20.0
+    }
+  ]
+}

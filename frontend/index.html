@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>WolfClaw v3</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════ EPIC LOADING SCREEN ═══════════ -->
+<div id="loading-screen">
+  <div class="loading-particles" id="loading-particles"></div>
+  <div class="loading-bg-layers">
+    <div class="loading-moon"></div>
+  </div>
+  <div class="loading-scanlines"></div>
+  <div class="claw-container">
+    <div class="claw-slash"></div>
+    <div class="claw-slash"></div>
+    <div class="claw-slash"></div>
+    <div class="claw-slash"></div>
+    <div class="claw-blood"></div>
+    <div class="claw-blood"></div>
+    <div class="claw-blood"></div>
+    <div class="claw-blood"></div>
+  </div>
+  <div class="loading-wolf-wrap">
+    <img src="/../image/logo.png" alt="Logo" style="width:500px; height:500px;">
+  </div>
+  <div class="loading-title">WOLFCLAW</div>
+  <div class="loading-tagline">MULTIPLAYER WEREWOLF TACTICAL</div>
+  <div class="loading-bar-wrap">
+    <div class="loading-bar-track">
+      <div class="loading-bar-fill"></div>
+    </div>
+    <div class="loading-status" id="loading-status-text">INITIALIZING PACK...</div>
+  </div>
+</div>
+
+<!-- ═══════════ CONNECT ═══════════ -->
+<div id="screen-connect" class="screen" style="display:flex">
+  <div class="screen-panel">
+    <div class="game-logo"><div class="wolf-eyes"><div class="wolf-eye"></div><div class="wolf-eye"></div></div><h1>WOLFCLAW</h1><p>MULTIPLAYER WEREWOLF TACTICAL</p></div>
+    <div class="form-group"><label>Server</label>
+      <div style="display:flex;gap:8px"><input id="inp-host" value="localhost" style="flex:2"><input id="inp-port" type="number" value="8080" style="flex:1"></div>
+    </div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login">Login</button>
+      <button class="auth-tab" id="tab-register">Register</button>
+      <button class="auth-tab" id="tab-guest">Guest</button>
+    </div>
+    <div id="auth-login">
+      <div class="form-group"><label>Username</label><input id="inp-login-user" placeholder="username"></div>
+      <div class="form-group"><label>Password</label><input id="inp-login-pass" type="password" placeholder="••••••••"></div>
+      <button class="btn btn-primary btn-full" id="btn-login">LOGIN</button>
+    </div>
+    <div id="auth-register" style="display:none">
+      <div class="form-group"><label>Username</label><input id="inp-reg-user" placeholder="3-20 chars, a-z 0-9 _"></div>
+      <div class="form-group"><label>Password</label><input id="inp-reg-pass" type="password" placeholder="min 6 chars"></div>
+      <div class="form-group"><label>Confirm</label><input id="inp-reg-pass2" type="password" placeholder="repeat password"></div>
+      <button class="btn btn-success btn-full" id="btn-register">CREATE ACCOUNT</button>
+    </div>
+    <div id="auth-guest" style="display:none">
+      <div class="form-group"><label>Nickname</label><input id="inp-guest-name" placeholder="Your name..." maxlength="20"></div>
+      <button class="btn btn-secondary btn-full" id="btn-guest">PLAY AS GUEST</button>
+    </div>
+    <div id="connection-status"></div>
+  </div>
+</div>
+
+<!-- ═══════════ LOBBY ═══════════ -->
+<div id="screen-lobby" class="screen" style="display:none;flex-direction:column;padding:16px;gap:12px">
+  <div class="lobby-top">
+    <div class="lobby-player-info">
+      <h2 id="lobby-player-name">Player</h2><span class="guest-badge" id="lobby-guest-badge"></span>
+      <div id="lobby-stats" style="display:none">
+        <div class="lobby-stats-grid">
+          <div class="stat-box"><div class="sv" id="st-kills">0</div><div class="sk">Kills</div></div>
+          <div class="stat-box"><div class="sv" id="st-deaths">0</div><div class="sk">Deaths</div></div>
+          <div class="stat-box"><div class="sv" id="st-wins">0</div><div class="sk">Wins</div></div>
+          <div class="stat-box"><div class="sv" style="color:#8b5cf6" id="st-wolf">0</div><div class="sk">Wolf Kills</div></div>
+        </div>
+        <div id="xp-bar-wrap" style="margin-top:8px">
+          <span style="font-size:0.72rem;color:#e3b341;white-space:nowrap">BP Lv.<span id="bp-level-lbl">1</span></span>
+          <div class="xp-bar-outer"><div class="xp-bar-fill" id="xp-bar" style="width:0%"></div></div>
+          <span style="font-size:0.72rem;color:#8b949e" id="xp-lbl">0 XP</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+      <button class="btn btn-purple btn-sm" id="btn-bp-open">🎖 Battle Pass</button>
+      <button class="btn btn-warning btn-sm" id="btn-tasks-open">📋 Tasks</button>
+      <button class="btn btn-primary btn-sm" id="btn-inv-open">🎨 Inventory</button>
+    </div>
+  </div>
+  <div class="lobby-main">
+    <div class="rooms-panel">
+      <h3>🎮 ROOMS</h3>
+      <div class="rooms-toolbar">
+        <button class="btn btn-primary btn-sm" id="btn-open-create-room">+ Create Room</button>
+        <button class="btn btn-secondary btn-sm" id="btn-join-private">🔒 Private</button>
+        <button class="btn btn-secondary btn-sm" id="btn-refresh-rooms">↻ Refresh</button>
+      </div>
+      <div id="room-list"><div class="empty-list">No rooms. Create one!</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ROOM ═══════════ -->
+<div id="screen-room" class="screen" style="display:none;flex-direction:column">
+  <div class="room-header">
+    <h2 id="room-title">Room</h2>
+    <span class="mode-badge tdm" id="room-mode-badge">TDM</span>
+    <span class="room-invite-display" id="room-invite-display" style="display:none">
+      🔒 Code: <span class="room-invite-code" id="room-invite-code">------</span>
+    </span>
+    <div style="margin-left:auto;display:flex;gap:8px">
+      <button class="btn btn-danger btn-sm" id="btn-leave-room">← Leave</button>
+    </div>
+  </div>
+  <div class="room-body">
+    <div class="room-players-col">
+      <div class="room-teams">
+        <div class="team-box red-box">
+          <div class="team-title" style="color:#f85149">🔴 RED TEAM (<span id="red-count">0</span>)</div>
+          <div id="player-list-red"></div>
+        </div>
+        <div class="team-box blue-box">
+          <div class="team-title" style="color:#58a6ff">🔵 BLUE TEAM (<span id="blue-count">0</span>)</div>
+          <div id="player-list-blue"></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px" id="mode-info-box">
+        <div class="mode-info" id="mode-info-tdm">⚔ TDM — Eliminate enemies. Win 5 rounds to claim victory.</div>
+        <div class="mode-info" id="mode-info-ctf" style="display:none">🚩 CTF — Steal the enemy flag and return it to your base. First to 3 captures wins.</div>
+        <div class="mode-info" id="mode-info-wolf" style="display:none">🐺 WOLF — One random player becomes the wolf every 20s. Wolf has 250HP and special abilities.</div>
+      </div>
+    </div>
+    <div class="room-sidebar">
+      <h3>TEAMS</h3>
+      <div class="team-buttons">
+        <button class="btn btn-danger btn-sm" id="btn-team-red">🔴 Red</button>
+        <button class="btn btn-primary btn-sm" id="btn-team-blue">🔵 Blue</button>
+      </div>
+      <button class="btn btn-secondary btn-sm" id="btn-team-none">⬜ Spectate</button>
+      <hr style="border-color:#30363d;margin:4px 0">
+      <button class="btn btn-success" id="btn-ready">✅ READY</button>
+      <button class="btn btn-warning" id="btn-start-game" style="display:none">▶ START GAME</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ GAME ═══════════ -->
+<div id="screen-game" style="display:none;position:fixed;inset:0">
+  <canvas id="game-canvas"></canvas>
+  <div id="hud">
+    <!-- Score -->
+    <div id="hud-score">
+      <div class="score-team red-side" id="hud-red">0</div>
+      <div class="score-divider">:</div>
+      <div class="score-team blue-side" id="hud-blue">0</div>
+    </div>
+    <div id="hud-round">Round 1</div>
+    <!-- HP -->
+    <div id="hud-hp">
+      <span class="hp-label">HP</span>
+      <div class="hp-bar-outer"><div class="hp-fill hp-high" id="hud-hp-bar" style="width:100%"></div></div>
+      <span id="hud-hp-text">100/100</span>
+    </div>
+    <!-- Weapon HUD -->
+    <div id="hud-weapon">
+      <div>
+        <div class="weapon-name" id="hw-name">ASSAULT RIFLE</div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="ammo-text" id="hw-ammo">30</span>
+          <span style="color:#8b949e;font-size:0.75rem">/ <span id="hw-max-ammo">30</span></span>
+          <span class="reload-label" id="hw-reload" style="display:none">RELOADING...</span>
+        </div>
+        <div class="ammo-bar-outer"><div class="ammo-bar-fill" id="hw-ammo-bar" style="width:100%"></div></div>
+      </div>
+    </div>
+    <div id="mobile-controls" style="display:none;">
+    <div id="joystick-zone"></div> <div class="mobile-btns-right">
+        <button id="btn-jump" class="m-btn">JUMP</button>
+        <button id="btn-shoot" class="m-btn">FIRE</button>
+    </div>
+</div>
+<style>
+  #mobile-controls {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    width: 100%;
+    height: 150px;
+    pointer-events: none; /* Altındaki oyuna tıklamayı engellemesin */
+    z-index: 100;
+}
+#joystick-zone {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    width: 120px;
+    height: 120px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    pointer-events: all;
+}
+.mobile-btns-right {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    pointer-events: all;
+}
+.m-btn {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: rgba(139, 92, 246, 0.5); /* Mor tema */
+    border: 2px solid white;
+    color: white;
+    font-weight: bold;
+    user-select: none;
+}
+</style>
+    <!-- Weapon selector -->
+    <div id="hud-weapons-sel">
+      <div class="weapon-slot active" id="ws-rifle"><span class="ws-key">1</span><span class="ws-name">AR</span></div>
+      <div class="weapon-slot" id="ws-sniper"><span class="ws-key">2</span><span class="ws-name">SNP</span></div>
+      <div class="weapon-slot" id="ws-shotgun"><span class="ws-key">3</span><span class="ws-name">SHT</span></div>
+      <div class="weapon-slot" id="ws-smg"><span class="ws-key">4</span><span class="ws-name">SMG</span></div>
+      <div class="weapon-slot" id="ws-pistol"><span class="ws-key">5</span><span class="ws-name">PST</span></div>
+    </div>
+    <!-- Kill/Death stats -->
+    <div id="hud-stats">
+      <span><span class="stat-label">K</span> <span class="stat-val" id="hud-kills">0</span></span>
+      <span><span class="stat-label">D</span> <span class="stat-val" id="hud-deaths">0</span></span>
+    </div>
+    <!-- Combo HUD -->
+    <div id="hud-combo">
+      <div class="combo-num" id="combo-num">3</div>
+      <div class="combo-label">KILL COMBO</div>
+    </div>
+    <!-- Respawn -->
+    <div id="hud-respawn">
+      <div class="resp-text" id="respawn-text">3.0s</div>
+      <div class="resp-sub">Respawning...</div>
+    </div>
+    <!-- Kill feed -->
+    <div id="kill-feed"></div>
+    <!-- Round banner -->
+    <div id="round-banner"><div class="banner-main"></div><div class="banner-sub"></div></div>
+    <!-- Wolf HUD -->
+    <div id="hud-wolf">🐺 Wolf: <span id="hud-wolf-name">?</span> — <span id="wolf-timer">20</span>s</div>
+    <!-- CTF HUD -->
+    <div id="hud-ctf">
+      <div class="ctf-flag-status"><span class="ctf-flag-icon">🔴</span><div class="ctf-flag-info"><div class="ctf-flag-label">RED FLAG</div><div id="ctf-red-status">At Base</div></div></div>
+      <div class="ctf-flag-status"><span class="ctf-flag-icon">🔵</span><div class="ctf-flag-info"><div class="ctf-flag-label">BLUE FLAG</div><div id="ctf-blue-status">At Base</div></div></div>
+    </div>
+    <!-- Controls hint -->
+    <div id="hud-controls">WASD: Move | 1-5: Weapon | R: Reload | Click: Shoot | E: Emote</div>
+  </div>
+  <!-- Emote panel -->
+  <button id="btn-emote-toggle" title="Emotes (E)">😊</button>
+  <div id="emote-panel">
+    <button class="emote-btn" data-emote="dance" title="Dance">💃</button>
+    <button class="emote-btn" data-emote="laugh" title="Laugh">😂</button>
+    <button class="emote-btn" data-emote="cry"   title="Cry">😭</button>
+    <button class="emote-btn" data-emote="rage"  title="Rage">😡</button>
+    <button class="emote-btn" data-emote="wave"  title="Wave">👋</button>
+    <button class="emote-btn" data-emote="salute"title="Salute">🫡</button>
+  </div>
+  <!-- Legendary overlay -->
+  <div id="legendary-overlay"><div class="legendary-text" id="legendary-text">⚡ 10 KILL COMBO ⚡</div><div class="legendary-sub">LEGENDARY!</div></div>
+  <!-- Game Over -->
+  <div id="game-over-overlay">
+    <div class="game-over-panel">
+      <div id="go-winner"></div><div id="go-score"></div>
+      <table id="go-scoreboard"><thead><tr><th>Team</th><th>Name</th><th>K</th><th>D</th><th>🐺</th><th>Combo</th></tr></thead><tbody></tbody></table>
+      <div class="go-buttons">
+        <button class="btn btn-primary" id="btn-go-lobby">🏠 Lobby</button>
+        <button class="btn btn-success" id="btn-go-room">🔄 Play Again</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Task popup area -->
+<div id="task-popup"></div>
+
+<!-- ═══════════ FRIENDS PANEL ═══════════ -->
+<button id="btn-friends-toggle">👥 Friends <span class="friends-badge" id="friends-badge"></span></button>
+<div id="friends-panel">
+  <div class="friends-header"><h3>👥 FRIENDS</h3><button class="btn-close-friends" id="btn-close-friends">✕</button></div>
+  <div class="friend-add-row"><input id="inp-friend-add" placeholder="Add by username..." maxlength="20"><button class="btn-friend-add" id="btn-friend-add">+</button></div>
+  <div class="friends-section-title">Pending Requests</div>
+  <div id="pending-list"></div>
+  <div class="friends-section-title">Online Friends</div>
+  <div id="friend-list" style="flex:1;overflow-y:auto"></div>
+</div>
+<div id="invite-toasts"></div>
+
+<!-- ═══════════ MODALS ═══════════ -->
+<div class="modal" id="create-room-modal">
+  <div class="modal-box">
+    <h3>🎮 CREATE ROOM</h3>
+    <div class="form-group"><label>Room Name</label><input id="inp-room-name" placeholder="My Epic Room" maxlength="30"></div>
+    <div class="form-group"><label>Game Mode</label>
+      <div class="mode-btns">
+        <button class="mode-btn active" data-mode="tdm">⚔ TDM</button>
+        <button class="mode-btn" data-mode="ctf">🚩 CTF</button>
+        <button class="mode-btn" data-mode="wolf">🐺 WOLF</button>
+      </div>
+    </div>
+    <div class="form-group"><label>Map</label>
+      <select id="sel-map-create" style="background:var(--panel);color:var(--light);border:1px solid var(--border);border-radius:6px;padding:8px;width:100%;font-size:0.85rem">
+        <option value="">🎲 Random Map</option>
+      </select>
+      <div id="map-preview-info" style="font-size:0.75rem;color:var(--dim);margin-top:4px;min-height:18px"></div>
+    </div>
+    <div class="form-group" style="flex-direction:row;align-items:center;gap:10px">
+      <input type="checkbox" id="chk-private" style="width:auto;margin:0">
+      <label style="text-transform:none;font-size:0.85rem">Private room (invite only)</label>
+    </div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" style="flex:1" id="btn-create-room">Create</button>
+      <button class="btn btn-secondary" style="flex:1" id="btn-cancel-create">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="join-private-modal">
+  <div class="modal-box">
+    <h3>🔒 PRIVATE ROOM</h3>
+    <div class="form-group"><label>Invite Code</label><input id="inp-invite-code" placeholder="6-char code" maxlength="6" style="text-transform:uppercase;letter-spacing:4px"></div>
+    <div class="modal-btns">
+      <button class="btn btn-primary" style="flex:1" id="btn-join-private-go">Join</button>
+      <button class="btn btn-secondary" style="flex:1" id="btn-cancel-private">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CRATE OVERLAY ═══════════ -->
+<div id="crate-overlay">
+  <div class="crate-box">
+    <h3 style="margin-bottom:16px;letter-spacing:2px">🎁 OPEN CRATE</h3>
+    <div id="crate-lid" class="crate-lid">📦</div>
+    <div style="font-size:0.8rem;color:#8b949e;margin-top:8px" id="crate-price-label">Click the box to open! (200 🪙)</div>
+    <div class="crate-reveal" id="crate-reveal">
+      <div class="crate-item-icon" id="cr-icon">🎨</div>
+      <div class="crate-item-name" id="cr-name">Item Name</div>
+      <div class="crate-item-rarity" id="cr-rarity">RARE</div>
+      <button class="btn btn-success" style="margin-top:8px" id="btn-crate-again">Open Another</button>
+    </div>
+    <button class="btn btn-secondary" style="margin-top:16px" id="btn-crate-close">Close</button>
+  </div>
+</div>
+
+<!-- ═══════════ INVENTORY PANEL ═══════════ -->
+<div id="inv-panel">
+  <div class="inv-box">
+    <div class="inv-header"><h3>🎨 INVENTORY</h3><button id="btn-inv-close" style="background:none;border:none;color:#8b949e;cursor:pointer;font-size:1.1rem">✕</button></div>
+    <div style="padding:10px 12px;border-bottom:1px solid #30363d;font-size:0.75rem;color:#8b949e">Coins: <span style="color:#e3b341;font-weight:bold" id="inv-coins">0</span> 🪙 &nbsp;|&nbsp; <button class="btn btn-warning btn-sm" id="btn-open-crate-from-inv">Open Crate (200 🪙)</button></div>
+    <div class="inv-tabs">
+      <button class="inv-tab active" data-slot="character">👤 Chars</button>
+      <button class="inv-tab" data-slot="weapon">🔫 Weapons</button>
+      <button class="inv-tab" data-slot="trail">✨ Trails</button>
+      <button class="inv-tab" data-slot="kill_fx">💥 Kill FX</button>
+      <button class="inv-tab" data-slot="entry">🌟 Entry</button>
+    </div>
+    <div class="inv-grid" id="inv-grid"></div>
+  </div>
+</div>
+
+<!-- ═══════════ TASKS PANEL ═══════════ -->
+<div id="tasks-panel">
+  <div class="tasks-box">
+    <div class="tasks-header"><h3>📋 DAILY & WEEKLY TASKS</h3><button id="btn-tasks-close" style="background:none;border:none;color:#8b949e;cursor:pointer;font-size:1.1rem">✕</button></div>
+    <div class="tasks-body" id="tasks-body"><div style="color:#8b949e;text-align:center;padding:20px">Loading tasks...</div></div>
+  </div>
+</div>
+
+<!-- ═══════════ BATTLE PASS ═══════════ -->
+<div id="bp-panel">
+  <div class="bp-box">
+    <div class="bp-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><h2 style="font-size:1.1rem;letter-spacing:3px">🎖 BATTLE PASS</h2><div style="font-size:0.75rem;color:#8b949e;margin-top:2px">Season 1 — 60 Levels</div></div>
+        <div style="text-align:right"><div id="bp-premium-status" style="font-size:0.75rem;color:#e3b341"></div><button class="btn btn-purple btn-sm" id="btn-buy-bp" style="display:none">Buy Premium (999 🪙)</button></div>
+      </div>
+      <div class="bp-level-bar" style="margin-top:12px">
+        <span style="font-size:0.72rem;color:#8b949e">Lv.</span>
+        <span id="bp-cur-level" style="font-size:1rem;font-weight:bold;color:#e3b341">1</span>
+        <div class="bp-bar-outer"><div class="bp-bar-fill" id="bp-xp-bar" style="width:0%"></div></div>
+        <span class="bp-level-text" id="bp-xp-label">0 / 1000 XP</span>
+      </div>
+    </div>
+    <div class="bp-track" id="bp-track"></div>
+    <div style="padding:12px 16px;border-top:1px solid #30363d;display:flex;justify-content:flex-end">
+      <button class="btn btn-secondary btn-sm" id="btn-bp-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ NOTIFICATION ═══════════ -->
+<div id="notif-toast"></div>
+
+<script src="socket.js"></script>
+<script src="game.js"></script>
+<script>
+const App = (() => {
+    let myId=null,myAccId=null,roomId=null,ready=false,currentMode='tdm',selMode='tdm';
+    let friends=[],pending=[];
+    let myAccount=null;
+    let invSlot='character', invItems=[], equips={};
+
+    const HOST=()=>document.getElementById('inp-host').value.trim()||'localhost';
+    const PORT=()=>parseInt(document.getElementById('inp-port').value)||8080;
+    const esc=s=>{const d=document.createElement('div');d.appendChild(document.createTextNode(String(s??'')));return d.innerHTML;};
+    const $=id=>document.getElementById(id);
+
+    // ── SOCKET HANDLERS ──────────────────────────────────────
+    function bindSocket(){
+        Socket.on('joined_server',d=>{
+            myId=d.playerId; myAccId=d.accountId||null; myAccount=d.account||null;
+            friends=d.friends||[]; pending=d.pending||[];
+            $('lobby-player-name').textContent=d.name;
+            $('lobby-guest-badge').textContent=myAccId?'':' (Guest)';
+            if(d.account){
+                const a=d.account;
+                $('lobby-stats').style.display='block';
+                $('st-kills').textContent=a.kills; $('st-deaths').textContent=a.deaths;
+                $('st-wins').textContent=a.wins;   $('st-wolf').textContent=a.wolf_kills;
+                const lvl=a.bp_level||1, xp=a.xp||0, xpPct=((xp%1000)/1000*100).toFixed(0);
+                $('bp-level-lbl').textContent=lvl; $('xp-bar').style.width=xpPct+'%';
+                $('xp-lbl').textContent=xp+' XP';
+            }
+            if(myAccId){ $('btn-friends-toggle').classList.add('visible'); renderFriends(); }
+            status('',''); showScreen('lobby');
+        });
+        Socket.on('registered',()=>{ status('Account created! Please login.','var(--green)'); switchTab('login'); });
+        Socket.on('room_list',d=>renderRooms(d.rooms));
+        Socket.on('room_created',d=>{ roomId=d.room.id; currentMode=d.room.mode; showScreen('room'); renderRoom(d.room); ready=false; });
+        Socket.on('room_joined', d=>{ roomId=d.room.id; currentMode=d.room.mode; showScreen('room'); renderRoom(d.room); ready=false; });
+        Socket.on('player_joined_room',d=>renderRoom(d.room));
+        Socket.on('player_left_room',  d=>renderRoom(d.room));
+        Socket.on('team_selected',     d=>renderRoom(d.room));
+        Socket.on('ready_update',      d=>renderRoom(d.room));
+        Socket.on('room_left',()=>{ roomId=null; ready=false; showScreen('lobby'); });
+
+        Socket.on('game_start',d=>{
+            currentMode=d.mode||'tdm';
+            Game.setPlayerId(myId); Game.init(d.map||[]);
+            showScreen('game');
+            $('hud-wolf').style.display=currentMode==='wolf'?'block':'none';
+            $('hud-ctf').style.display=currentMode==='ctf'?'flex':'none';
+            $('btn-emote-toggle').style.display='block';
+            showBanner('ROUND '+d.round,'Fight!');
+        });
+
+        Socket.on('state',d=>{
+            Game.updateState(d);
+            updateHUD(Game.getMyPlayer(),d);
+        });
+
+        Socket.on('player_killed',d=>{
+            Game.onPlayerKilled(d);
+            const icon=d.was_wolf?'🐺':'⚔';
+            addKillFeed(`${esc(d.killer_name)} ${icon} ${esc(d.victim_name)}`);
+        });
+        Socket.on('player_hit',d=>Game.onPlayerHit(d));
+
+        Socket.on('round_end',d=>{ const w=d.winner==='draw'?'DRAW':d.winner==='red'?'🔴 RED WINS':'🔵 BLUE WINS'; showBanner(w,`${d.red_score} – ${d.blue_score}`); });
+        Socket.on('round_start',d=>showBanner('ROUND '+d.round,'Fight!'));
+        Socket.on('wolf_assigned',d=>{ $('hud-wolf-name').textContent=d.name; addKillFeed('🐺 '+d.name+' is the WOLF!'); });
+        Socket.on('legendary_combo',d=>{ addKillFeed('💥 '+d.player_name+' hit '+d.combo+' KILL COMBO!'); });
+        Socket.on('emote',d=>addKillFeed(`${esc(d.player_name)}: ${d.emote_icon}`));
+
+        Socket.on('flag_picked',   d=>addKillFeed('🚩 '+esc(d.name)+' snatched '+d.flagTeam+' flag!'));
+        Socket.on('flag_captured', d=>addKillFeed('🏆 '+esc(d.by)+' captured the '+d.flagTeam+' flag for '+d.team+'!'));
+        Socket.on('flag_dropped',  ()=>addKillFeed('💨 Flag was dropped!'));
+        Socket.on('flag_returned', d=>addKillFeed('🔄 '+esc(d.by)+' returned the '+d.flagTeam+' flag!'));
+
+        Socket.on('game_over',d=>setTimeout(()=>showGameOver(d),2500));
+
+        // Inventory / Crate / Tasks / BP
+        Socket.on('inventory',d=>{ invItems=d.items||[]; renderInvGrid(); });
+        Socket.on('equip_ok', d=>{ notif('Equipped!'); });
+        Socket.on('crate_opened',d=>{
+            if(d.refund){notif('All items owned! Refunded '+d.refund_coins+' 🪙');return;}
+            showCrateReveal(d.item);
+        });
+        Socket.on('tasks',d=>renderTasks(d.tasks));
+        Socket.on('bp_data',d=>renderBP(d));
+        Socket.on('bp_activated',()=>notif('🎖 Battle Pass Premium activated!'));
+        Socket.on('task_complete',d=>{
+            d.rewards?.forEach(r=>showTaskPopup(r));
+        });
+
+        // Friends
+        Socket.on('friend_request_received',d=>{ pending.push({id:d.from_id,username:d.from_name}); renderFriends(); showFriendToast(d.from_name,d.from_id); });
+        Socket.on('friend_request_sent',d=>notif('✅ Request sent to '+d.to));
+        Socket.on('friend_accepted',d=>{ if(!friends.find(f=>f.id==d.friend_id)){ friends.push({id:d.friend_id,username:'Friend',online:true}); renderFriends(); } });
+        Socket.on('friend_removed',d=>{ friends=friends.filter(f=>f.id!=d.friend_id); renderFriends(); });
+        Socket.on('friend_online', d=>{ const f=friends.find(f=>f.id==d.id); if(f)f.online=true; renderFriends(); });
+        Socket.on('friend_offline',d=>{ const f=friends.find(f=>f.id==d.id); if(f)f.online=false; renderFriends(); });
+        Socket.on('friend_list',   d=>{ friends=d.friends; pending=d.pending; renderFriends(); });
+        Socket.on('room_invite',d=>showRoomInvite(d));
+        Socket.on('invite_sent',()=>notif('Invite sent!'));
+        Socket.on('error',d=>status(d.message,'var(--red)'));
+        Socket.on('disconnected',()=>{ Game.stop(); showScreen('connect'); status('Disconnected','var(--red)'); });
+    }
+
+    // ── SCREENS ───────────────────────────────────────────────
+    function showScreen(name){
+        ['connect','lobby','room','game'].forEach(s=>{ const el=$('screen-'+s); if(el) el.style.display=s===name?(s==='game'?'block':'flex'):'none'; });
+        const ft=$('btn-friends-toggle');
+        if(myAccId&&['lobby','room'].includes(name)) ft.classList.add('visible'); else ft.classList.remove('visible');
+        if(name==='game'){ $('btn-emote-toggle').style.display='block'; }
+        else { $('btn-emote-toggle').style.display='none'; $('emote-panel').classList.remove('visible'); }
+    }
+    function switchTab(t){ ['login','register','guest'].forEach(x=>{ $('auth-'+x).style.display=x===t?'block':'none'; $('tab-'+x).classList.toggle('active',x===t); }); }
+    function status(msg,col){ $('connection-status').textContent=msg; $('connection-status').style.color=col; }
+
+    // ── AUTH ─────────────────────────────────────────────────
+    async function doConnect(){ status('Connecting...','var(--dim)'); try{await Socket.connect(HOST(),PORT());}catch(e){status('Connection failed','var(--red)');return false;} return true; }
+    async function doLogin(){ if(!await doConnect()) return; Socket.send({type:'login',username:$('inp-login-user').value,password:$('inp-login-pass').value}); }
+    async function doRegister(){ const p=$('inp-reg-pass').value; if(p!==$('inp-reg-pass2').value){status('Passwords do not match','var(--red)');return;} if(!await doConnect()) return; Socket.send({type:'register',username:$('inp-reg-user').value,password:p}); }
+    async function doGuest(){ const n=$('inp-guest-name').value.trim(); if(!n){status('Enter nickname','var(--red)');return;} if(!await doConnect()) return; Socket.send({type:'guest',name:n}); }
+
+    // ── ROOMS ────────────────────────────────────────────────
+    function renderRooms(rooms){
+        const el=$('room-list'); el.innerHTML='';
+        if(!rooms?.length){el.innerHTML='<div class="empty-list">No rooms. Create one!</div>';return;}
+        rooms.forEach(r=>{
+            const d=document.createElement('div'); d.className='room-item';
+            const st=r.state==='lobby'?'<span style="color:var(--green)">● Waiting</span>':'<span style="color:var(--red)">● In Game</span>';
+            d.innerHTML=`<div><div class="room-name">${esc(r.name)} <span class="mode-badge ${r.mode}">${r.mode.toUpperCase()}</span></div>
+              <div class="room-meta">🔴${r.red} 🔵${r.blue} · ${r.total}/8 · ${st}</div></div>
+              <button class="btn btn-primary btn-sm" ${r.state!=='lobby'?'disabled style="opacity:0.4"':''} data-rid="${r.id}">Join</button>`;
+            el.appendChild(d);
+        });
+        el.querySelectorAll('button[data-rid]').forEach(b=>b.addEventListener('click',()=>Socket.send({type:'join_room',room_id:b.dataset.rid})));
+    }
+
+    function renderRoom(room){
+        const isHost=room.host===myId;
+        $('room-title').textContent=room.name;
+        const mb=$('room-mode-badge'); mb.textContent=room.mode.toUpperCase(); mb.className='mode-badge '+room.mode;
+        const inv=$('room-invite-display');
+        if(room.private&&room.invite){inv.style.display='inline-flex';$('room-invite-code').textContent=room.invite;}else inv.style.display='none';
+        $('red-count').textContent=room.red; $('blue-count').textContent=room.blue;
+        $('btn-start-game').style.display=isHost?'block':'none';
+        ['tdm','ctf','wolf'].forEach(m=>$('mode-info-'+m).style.display=room.mode===m?'block':'none');
+        const red=room.players.filter(p=>p.team==='red');
+        const blue=room.players.filter(p=>p.team==='blue');
+        function pHTML(p){return`<div class="lobby-player ${p.team}"><span>${p.team==='red'?'🔴':p.team==='blue'?'🔵':'⬜'}</span><span class="p-name">${esc(p.name)}${p.id===room.host?' 👑':''}</span><span class="p-ready">${p.ready?'✅':'⏳'}</span></div>`;}
+        $('player-list-red').innerHTML=red.map(pHTML).join('')||'<div style="color:var(--dim);font-size:0.8rem;padding:8px">Empty</div>';
+        $('player-list-blue').innerHTML=blue.map(pHTML).join('')||'<div style="color:var(--dim);font-size:0.8rem;padding:8px">Empty</div>';
+    }
+
+    // ── HUD ──────────────────────────────────────────────────
+    function updateHUD(me, s){
+        if(!me) return;
+        const hp=me.hp,mhp=me.maxHp||100;
+        const hpPct=(hp/mhp)*100;
+        $('hud-hp-bar').style.width=hpPct+'%';
+        $('hud-hp-bar').className='hp-fill'+(hp>60*mhp/100?' hp-high':hp>30*mhp/100?' hp-mid':' hp-low');
+        $('hud-hp-text').textContent=hp+'/'+mhp;
+        $('hud-red').textContent=s.red_score; $('hud-blue').textContent=s.blue_score;
+        $('hud-round').textContent='Round '+s.round;
+        $('hud-kills').textContent=me.kills; $('hud-deaths').textContent=me.deaths;
+        // Weapon
+        const wn={rifle:'ASSAULT RIFLE',sniper:'SNIPER RIFLE',shotgun:'SHOTGUN',smg:'SMG',pistol:'PISTOL'};
+        $('hw-name').textContent=wn[me.weapon]||me.weapon.toUpperCase();
+        $('hw-ammo').textContent=me.ammo; $('hw-max-ammo').textContent=me.maxAmmo;
+        const aPct=(me.ammo/me.maxAmmo)*100;
+        $('hw-ammo-bar').style.width=aPct+'%';
+        $('hw-ammo-bar').style.background=aPct>50?'var(--gold)':aPct>25?'var(--orange)':'var(--red)';
+        $('hw-reload').style.display=me.reloading?'inline':'none';
+        // Weapon selector
+        ['rifle','sniper','shotgun','smg','pistol'].forEach(w=>$('ws-'+w)?.classList.toggle('active',me.weapon===w));
+        // Combo
+        const combo=$('hud-combo'); const cn=$('combo-num');
+        if(me.combo>=3){ combo.style.display='block'; cn.textContent=me.combo+'×';
+            cn.style.color=me.combo>=10?'#8b5cf6':me.combo>=8?'#f1c40f':me.combo>=5?'#e74c3c':'#f97316';
+        } else combo.style.display='none';
+        // Respawn
+        const rs=$('hud-respawn');
+        if(!me.alive&&me.respawn>0){ rs.style.display='block'; $('respawn-text').textContent=me.respawn.toFixed(1)+'s'; }
+        else rs.style.display='none';
+        // Wolf timer
+        if(currentMode==='wolf'&&s.wolf_timer>0) $('wolf-timer').textContent=Math.ceil(s.wolf_timer);
+        // CTF flags
+        if(currentMode==='ctf'&&s.flags){
+            s.flags.forEach(f=>{
+                const el=$('ctf-'+f.team+'-status'); if(!el) return;
+                el.textContent=f.status==='base'?'At Base ✅':f.status==='carried'?'CARRIED ⚠️':'DROPPED ❌';
+            });
+        }
+    }
+
+    function addKillFeed(msg){
+        const f=$('kill-feed'); const d=document.createElement('div'); d.className='kill-entry'; d.innerHTML=msg;
+        f.appendChild(d); if(f.children.length>8) f.removeChild(f.firstChild);
+        setTimeout(()=>d.remove(),4500);
+    }
+    function showBanner(main,sub){ const b=$('round-banner'); b.querySelector('.banner-main').textContent=main; b.querySelector('.banner-sub').textContent=sub||''; b.style.display='flex'; setTimeout(()=>b.style.display='none',3000); }
+    function showGameOver(data){
+        $('game-over-overlay').style.display='flex';
+        $('go-winner').textContent=data.winner==='red'?'🔴 RED TEAM WINS!':'🔵 BLUE TEAM WINS!';
+        $('go-score').textContent=`Red ${data.red_score} – ${data.blue_score} Blue`;
+        const tb=$('go-scoreboard').querySelector('tbody'); tb.innerHTML='';
+        [...data.scoreboard].sort((a,b)=>b.kills-a.kills).forEach(p=>{
+            const tr=document.createElement('tr');
+            tr.innerHTML=`<td>${p.team==='red'?'🔴':'🔵'}</td><td>${esc(p.name)}${p.id===myId?' (You)':''}</td><td>${p.kills}</td><td>${p.deaths}</td><td>${p.wolf_kills||0}</td><td style="color:var(--gold)">${p.combo||0}×</td>`;
+            tb.appendChild(tr);
+        });
+    }
+
+    // ── CRATE ────────────────────────────────────────────────
+    function openCrateOverlay(){
+        $('crate-overlay').classList.add('active');
+        $('crate-lid').className='crate-lid'; $('crate-lid').textContent='📦';
+        $('crate-reveal').style.display='none'; $('crate-price-label').style.display='block';
+    }
+    function showCrateReveal(item){
+        const icons={character:'👤',weapon:'🔫',trail:'✨',kill_fx:'💥',entry:'🌟'};
+        $('cr-icon').textContent=icons[item.type]||'🎁';
+        $('cr-name').textContent=item.name;
+        $('cr-rarity').textContent=item.rarity.toUpperCase();
+        $('cr-rarity').className='crate-item-rarity rarity-'+item.rarity;
+        $('crate-reveal').style.display='block'; $('crate-reveal').style.animation='none';
+        requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ $('crate-reveal').style.animation=''; $('crate-reveal').style.animation='revealIn 0.5s ease forwards'; }); });
+    }
+
+    // ── INVENTORY ─────────────────────────────────────────────
+    const SKIN_ICONS={character:'👤',weapon:'🔫',trail:'✨',kill_fx:'💥',entry:'🌟'};
+    const SLOT_COL={character:'equip_char',weapon:'equip_weapon',trail:'equip_trail',kill_fx:'equip_kill_fx',entry:'equip_entry'};
+    const CATALOG=[
+        {key:'char_default', name:'Default Soldier',type:'character',rarity:'common'},
+        {key:'char_shadow',  name:'Shadow Wolf',   type:'character',rarity:'rare'},
+        {key:'char_crimson', name:'Crimson Knight', type:'character',rarity:'epic'},
+        {key:'char_neon',    name:'Neon Ghost',     type:'character',rarity:'legendary'},
+        {key:'char_inferno', name:'Inferno Soldier',type:'character',rarity:'epic'},
+        {key:'char_cyber',   name:'Cyber Warrior',  type:'character',rarity:'rare'},
+        {key:'wskin_golden', name:'Golden Rifle',   type:'weapon',  rarity:'epic'},
+        {key:'wskin_dragon', name:'Dragon Sniper',  type:'weapon',  rarity:'rare'},
+        {key:'wskin_neon',   name:'Neon SMG',       type:'weapon',  rarity:'epic'},
+        {key:'trail_fire',   name:'Fire Trail',     type:'trail',   rarity:'rare'},
+        {key:'trail_elec',   name:'Electric Trail', type:'trail',   rarity:'epic'},
+        {key:'trail_void',   name:'Void Trail',     type:'trail',   rarity:'legendary'},
+        {key:'kill_boom',    name:'Explosion Kill', type:'kill_fx', rarity:'rare'},
+        {key:'kill_lightning',name:'Lightning Kill',type:'kill_fx', rarity:'epic'},
+        {key:'kill_galaxy',  name:'Galaxy Kill',    type:'kill_fx', rarity:'legendary'},
+        {key:'entry_flame',  name:'Flame Entry',   type:'entry',   rarity:'rare'},
+        {key:'entry_tele',   name:'Teleport Entry',type:'entry',   rarity:'epic'},
+        {key:'entry_meteor', name:'Meteor Drop',   type:'entry',   rarity:'legendary'},
+    ];
+    function renderInvGrid(){
+        const grid=$('inv-grid'); grid.innerHTML='';
+        const ownedKeys=(invItems||[]).map(i=>i.skin_key);
+        const filtered=CATALOG.filter(s=>s.type===invSlot);
+        filtered.forEach(s=>{
+            const owned=ownedKeys.includes(s.key);
+            const div=document.createElement('div');
+            div.className='inv-item'+(owned?'':' locked');
+            div.innerHTML=`<div class="item-icon">${SKIN_ICONS[s.type]||'🎁'}</div><div class="item-name">${esc(s.name)}</div><div class="item-rarity rarity-${s.rarity}">${s.rarity.toUpperCase()}</div>`;
+            if(!owned){ const lock=document.createElement('div'); lock.style.cssText='position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:rgba(0,0,0,0.4);border-radius:8px'; lock.textContent='🔒'; div.appendChild(lock); }
+            if(owned) div.addEventListener('click',()=>{ Socket.send({type:'equip',skin_key:s.key,slot:invSlot}); });
+            grid.appendChild(div);
+        });
+    }
+
+    // ── TASKS ─────────────────────────────────────────────────
+    function renderTasks(tasks){
+        const body=$('tasks-body'); body.innerHTML='';
+        const daily=tasks.filter(t=>t.type==='daily'), weekly=tasks.filter(t=>t.type==='weekly');
+        [[daily,'📅 Daily Tasks'],[weekly,'📆 Weekly Tasks']].forEach(([ts,title])=>{
+            if(!ts.length) return;
+            const gt=document.createElement('div'); gt.className='task-group-title'; gt.textContent=title; body.appendChild(gt);
+            ts.forEach(t=>{
+                const pct=Math.min(100,(t.progress/t.goal)*100);
+                const div=document.createElement('div'); div.className='task-item'+(t.completed?' done':'');
+                div.innerHTML=`<div class="task-info"><div class="task-name">${esc(t.name)} ${t.completed?'✅':''}</div>
+                  <div class="task-reward">+${t.xp} XP &nbsp;·&nbsp; +${t.coins} 🪙</div>
+                  <div class="task-progress-bar"><div class="task-progress-fill" style="width:${pct}%"></div></div>
+                  <div style="font-size:0.68rem;color:#8b949e;margin-top:3px">${t.progress} / ${t.goal}</div></div>
+                  <div class="task-done-check">${t.completed?'✅':'⬜'}</div>`;
+                body.appendChild(div);
+            });
+        });
+        if(!tasks.length) body.innerHTML='<div style="color:#8b949e;text-align:center;padding:20px">No tasks available</div>';
+    }
+
+    // ── BATTLE PASS ───────────────────────────────────────────
+    function renderBP(d){
+        $('bp-cur-level').textContent=d.level;
+        const xpInLevel=d.xp%d.xp_per_level, pct=(xpInLevel/d.xp_per_level*100).toFixed(0);
+        $('bp-xp-bar').style.width=pct+'%';
+        $('bp-xp-label').textContent=xpInLevel+' / '+d.xp_per_level+' XP';
+        $('bp-premium-status').textContent=d.premium?'⭐ PREMIUM ACTIVE':'Free Track';
+        $('btn-buy-bp').style.display=d.premium?'none':'inline-block';
+        const track=$('bp-track'); track.innerHTML='';
+        const rarityIcon={common:'⬜',rare:'🔷',epic:'🟣',legendary:'⭐'};
+        d.items.forEach(item=>{
+            const div=document.createElement('div');
+            div.className='bp-item'+(item.owned?' owned':item.unlocked?' unlocked':'')+(item.premium?' premium-only':'');
+            div.innerHTML=`${item.premium?'<span class="bp-premium-crown">👑</span>':''}
+              ${!item.unlocked?'<span class="bp-lock">🔒</span>':''}
+              <div class="bp-item-lvl">Lv.${item.bp_level}</div>
+              <div class="bp-item-icon">${rarityIcon[item.rarity]||'⬜'}</div>
+              <div class="bp-item-name">${esc(item.name)}</div>`;
+            track.appendChild(div);
+        });
+    }
+
+    // ── FRIENDS ───────────────────────────────────────────────
+    function renderFriends(){
+        const fl=$('friend-list'); fl.innerHTML=''; const pl=$('pending-list'); pl.innerHTML='';
+        pending.forEach(pr=>{ const d=document.createElement('div'); d.className='pending-item'; d.innerHTML=`<span class="pending-name">📨 ${esc(pr.username)}</span><button class="btn-accept" data-id="${pr.id}">✔</button>`; pl.appendChild(d); });
+        pl.querySelectorAll('.btn-accept').forEach(b=>b.addEventListener('click',()=>{ Socket.send({type:'friend_accept',from_id:parseInt(b.dataset.id)}); pending=pending.filter(p=>p.id!=b.dataset.id); renderFriends(); }));
+        const onlines=friends.filter(f=>f.online), offlines=friends.filter(f=>!f.online);
+        [...onlines,...offlines].forEach(f=>{
+            const d=document.createElement('div'); d.className='friend-item';
+            d.innerHTML=`<div class="friend-dot ${f.online?'online':'offline'}"></div><span class="friend-name">${esc(f.username)}</span>
+              <div class="friend-actions">${roomId&&f.online?`<button data-id="${f.id}" class="fi-invite">Inv</button>`:''}<button data-id="${f.id}" class="fi-remove">✕</button></div>`;
+            fl.appendChild(d);
+        });
+        fl.querySelectorAll('.fi-invite').forEach(b=>b.addEventListener('click',()=>Socket.send({type:'friend_invite',friend_id:parseInt(b.dataset.id)})));
+        fl.querySelectorAll('.fi-remove').forEach(b=>b.addEventListener('click',()=>{ Socket.send({type:'friend_remove',friend_id:parseInt(b.dataset.id)}); friends=friends.filter(f=>f.id!=b.dataset.id); renderFriends(); }));
+        const badge=$('friends-badge'); badge.textContent=pending.length||''; badge.style.display=pending.length?'inline-block':'none';
+    }
+    function showFriendToast(name,fromId){
+        const c=$('invite-toasts'); const d=document.createElement('div'); d.className='invite-toast';
+        d.innerHTML=`<div class="invite-toast-title">👥 Friend request from <b>${esc(name)}</b></div>
+          <div class="invite-toast-btns"><button class="btn btn-success btn-sm" id="ft-accept">Accept</button><button class="btn btn-secondary btn-sm" id="ft-decline">Ignore</button></div>`;
+        c.appendChild(d);
+        d.querySelector('#ft-accept').onclick=()=>{ Socket.send({type:'friend_accept',from_id:fromId}); d.remove(); };
+        d.querySelector('#ft-decline').onclick=()=>d.remove();
+        setTimeout(()=>d.remove(),12000);
+    }
+    function showRoomInvite(data){
+        const c=$('invite-toasts'); const d=document.createElement('div'); d.className='invite-toast';
+        d.innerHTML=`<div class="invite-toast-title">🎮 Room invite from <b>${esc(data.from_name)}</b></div>
+          <div class="invite-toast-sub">${esc(data.room_name)} · <span class="mode-badge ${data.mode}">${data.mode.toUpperCase()}</span></div>
+          <div class="invite-toast-btns"><button class="btn btn-success btn-sm" id="ri-acc">Join</button><button class="btn btn-secondary btn-sm" id="ri-dec">Decline</button></div>`;
+        c.appendChild(d);
+        d.querySelector('#ri-acc').onclick=()=>{ Socket.send({type:'join_private',code:data.invite_code}); d.remove(); };
+        d.querySelector('#ri-dec').onclick=()=>d.remove();
+        setTimeout(()=>d.remove(),20000);
+    }
+    function showTaskPopup(r){
+        const area=$('task-popup'); const d=document.createElement('div'); d.className='task-popup-item';
+        d.innerHTML=`<div class="tp-title">✅ Task Complete!</div><div style="font-size:0.8rem;color:var(--text);margin:2px 0">${esc(r.name)}</div><div class="tp-reward">+${r.xp} XP · +${r.coins} 🪙</div>`;
+        area.appendChild(d); setTimeout(()=>d.remove(),4000);
+    }
+    function notif(msg){ const t=$('notif-toast'); t.textContent=msg; t.style.display='block'; clearTimeout(notif._t); notif._t=setTimeout(()=>t.style.display='none',2500); }
+
+    // ── BIND UI ───────────────────────────────────────────────
+    function bindUI(){
+        // Auth tabs
+        ['login','register','guest'].forEach(t=>$('tab-'+t).addEventListener('click',()=>switchTab(t)));
+        $('btn-login').addEventListener('click',doLogin);
+        $('btn-register').addEventListener('click',doRegister);
+        $('btn-guest').addEventListener('click',doGuest);
+        $('inp-login-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+        $('inp-guest-name').addEventListener('keydown',e=>{if(e.key==='Enter')doGuest();});
+
+        // Lobby
+        $('btn-open-create-room').addEventListener('click',()=>{ Socket.send({type:'get_map_pool',mode:selMode}); $('create-room-modal').classList.add('active'); });
+        $('btn-refresh-rooms').addEventListener('click',()=>Socket.send({type:'get_rooms'}));
+        $('btn-cancel-create').addEventListener('click',()=>$('create-room-modal').classList.remove('active'));
+        $('btn-join-private').addEventListener('click',()=>$('join-private-modal').classList.add('active'));
+        $('btn-cancel-private').addEventListener('click',()=>$('join-private-modal').classList.remove('active'));
+        $('btn-join-private-go').addEventListener('click',()=>{ const c=$('inp-invite-code').value.trim().toUpperCase(); if(c.length!==6){notif('Code must be 6 chars');return;} Socket.send({type:'join_private',code:c}); $('join-private-modal').classList.remove('active'); });
+        document.querySelectorAll('.mode-btn').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('.mode-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); selMode=b.dataset.mode; Socket.send({type:'get_map_pool',mode:selMode}); }));
+        $('btn-create-room').addEventListener('click',()=>{ const n=$('inp-room-name').value.trim(); if(!n)return; const mapId=$('sel-map-create').value; Socket.send({type:'create_room',room_name:n,mode:selMode,private:$('chk-private').checked,map_id:mapId||''}); $('create-room-modal').classList.remove('active'); });
+        Socket.on('map_pool',(d)=>{
+            const sel=$('sel-map-create'); if(!sel) return;
+            sel.innerHTML='<option value="">🎲 Random Map</option>';
+            (d.pool||[]).forEach(m=>{ const o=document.createElement('option'); o.value=m.id; o.textContent=m.name+' ('+( m.modes||[]).join('/')+')'; sel.appendChild(o); });
+        });
+        $('sel-map-create') && $('sel-map-create').addEventListener('change',()=>{
+            const pool=window._lastMapPool||[]; const id=$('sel-map-create').value;
+            const info=$('map-preview-info'); if(!info) return;
+            const m=pool.find(x=>x.id===id); info.textContent=m?'📋 '+m.description:'🎲 Sunucu rastgele harita seçer';
+        });
+        Socket.on('map_pool',(d)=>{ window._lastMapPool=d.pool||[]; });
+
+        // Inventory / Crate / Tasks / BP
+        $('btn-inv-open').addEventListener('click',()=>{ $('inv-panel').classList.add('active'); Socket.send({type:'get_inventory'}); });
+        $('btn-inv-close').addEventListener('click',()=>$('inv-panel').classList.remove('active'));
+        document.querySelectorAll('.inv-tab').forEach(t=>t.addEventListener('click',()=>{ document.querySelectorAll('.inv-tab').forEach(x=>x.classList.remove('active')); t.classList.add('active'); invSlot=t.dataset.slot; renderInvGrid(); }));
+        $('btn-open-crate-from-inv').addEventListener('click',()=>{ $('inv-panel').classList.remove('active'); openCrateOverlay(); });
+        $('crate-lid').addEventListener('click',()=>{ $('crate-lid').classList.add('opening'); setTimeout(()=>Socket.send({type:'open_crate',crate_id:1}),600); });
+        $('btn-crate-again').addEventListener('click',()=>{ $('crate-lid').className='crate-lid'; $('crate-lid').textContent='📦'; $('crate-reveal').style.display='none'; });
+        $('btn-crate-close').addEventListener('click',()=>$('crate-overlay').classList.remove('active'));
+        $('btn-tasks-open').addEventListener('click',()=>{ $('tasks-panel').classList.add('active'); Socket.send({type:'get_tasks'}); });
+        $('btn-tasks-close').addEventListener('click',()=>$('tasks-panel').classList.remove('active'));
+        $('btn-bp-open').addEventListener('click',()=>{ $('bp-panel').classList.add('active'); if(myAccId) Socket.send({type:'get_bp'}); });
+        $('btn-bp-close').addEventListener('click',()=>$('bp-panel').classList.remove('active'));
+        $('btn-buy-bp').addEventListener('click',()=>Socket.send({type:'buy_bp'}));
+
+        // Room
+        $('btn-team-red').addEventListener('click',()=>{ ready=false; resetReady(); Socket.send({type:'select_team',team:'red'}); });
+        $('btn-team-blue').addEventListener('click',()=>{ ready=false; resetReady(); Socket.send({type:'select_team',team:'blue'}); });
+        $('btn-team-none').addEventListener('click',()=>{ ready=false; resetReady(); Socket.send({type:'select_team',team:''}); });
+        $('btn-ready').addEventListener('click',()=>{ ready=!ready; $('btn-ready').textContent=ready?'⏳ NOT READY':'✅ READY'; Socket.send({type:'ready',ready}); });
+        $('btn-start-game').addEventListener('click',()=>Socket.send({type:'start_game'}));
+        $('btn-leave-room').addEventListener('click',()=>Socket.send({type:'leave_room'}));
+
+        // Game over
+        $('btn-go-lobby').addEventListener('click',()=>{ $('game-over-overlay').style.display='none'; Game.stop(); roomId=null; Socket.send({type:'leave_room'}); showScreen('lobby'); });
+        $('btn-go-room').addEventListener('click',()=>{ $('game-over-overlay').style.display='none'; Game.stop(); showScreen('room'); ready=false; resetReady(); });
+
+        // Friends
+        $('btn-friends-toggle').addEventListener('click',()=>$('friends-panel').classList.toggle('visible'));
+        $('btn-close-friends').addEventListener('click',()=>$('friends-panel').classList.remove('visible'));
+        $('btn-friend-add').addEventListener('click',()=>{ const u=$('inp-friend-add').value.trim(); if(!u)return; Socket.send({type:'friend_add',username:u}); $('inp-friend-add').value=''; });
+        $('inp-friend-add').addEventListener('keydown',e=>{if(e.key==='Enter')$('btn-friend-add').click();});
+
+        // Emote panel
+        $('btn-emote-toggle').addEventListener('click',()=>$('emote-panel').classList.toggle('visible'));
+        document.querySelectorAll('.emote-btn').forEach(b=>b.addEventListener('click',()=>{ Socket.send({type:'input',action:'emote',key:b.dataset.emote}); $('emote-panel').classList.remove('visible'); }));
+        // Keyboard E = emote toggle
+        window.addEventListener('keydown',e=>{ if(e.key==='KeyE'||e.key==='e') if($('screen-game').style.display!=='none') $('emote-panel').classList.toggle('visible'); });
+    }
+
+    function resetReady(){ $('btn-ready').textContent='✅ READY'; }
+    function init(){ bindSocket(); bindUI(); }
+    return{init};
+})();
+// Loading screen
+(function(){
+  var msgs=["INITIALIZING PACK...","LOADING COMBAT DATA...","SYNCING WEREWOLF GENES...","SHARPENING CLAWS...","THE HUNT BEGINS..."];
+  var i=0;
+  var el=document.getElementById("loading-status-text");
+  var interval=setInterval(function(){
+    i++;
+    if(el && i<msgs.length) el.textContent=msgs[i];
+    if(i>=msgs.length-1) clearInterval(interval);
+  },580);
+  // particles — mixed blood and spark
+  var p=document.getElementById("loading-particles");
+  if(p){
+    for(var n=0;n<40;n++){
+      var d=document.createElement("div");
+      d.className="loading-particle " + (n%3===0 ? "spark" : "blood");
+      d.style.left=Math.random()*100+"%";
+      d.style.animationDuration=(3+Math.random()*10)+"s";
+      d.style.animationDelay=(Math.random()*6)+"s";
+      d.style.width=(1+Math.random()*3)+"px";
+      d.style.height=(1+Math.random()*3)+"px";
+      p.appendChild(d);
+    }
+  }
+  // flash + hide after loading
+  setTimeout(function(){
+    var ls=document.getElementById("loading-screen");
+    if(ls){
+      ls.classList.add("flash");
+      setTimeout(function(){
+        ls.classList.add("fade-out");
+        setTimeout(function(){ ls.style.display="none"; },700);
+      },150);
+    }
+  },4700);
+})();
+App.init();
+</script>
+</body>
+</html>

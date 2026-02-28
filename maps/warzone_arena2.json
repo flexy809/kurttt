@@ -1,0 +1,134 @@
+{
+    "id": "warzone_arena2",
+    "name": "test",
+    "description": "",
+    "thumbnail": "",
+    "modes": [
+        "tdm"
+    ],
+    "width": 2400,
+    "height": 600,
+    "background": "bg_default",
+    "music": "",
+    "spawns": {
+        "red": [
+            {
+                "x": 159,
+                "y": 459
+            }
+        ],
+        "blue": [
+            {
+                "x": 1705,
+                "y": 486
+            }
+        ]
+    },
+    "ctf_flags": {
+        "red": {
+            "x": 80,
+            "y": 560,
+            "baseX": 80,
+            "baseY": 560
+        },
+        "blue": {
+            "x": 2320,
+            "y": 560,
+            "baseX": 2320,
+            "baseY": 560
+        }
+    },
+    "platforms": [
+        {
+            "x": 0,
+            "y": 560,
+            "w": 2400,
+            "h": 40,
+            "type": "solid"
+        },
+        {
+            "x": 477,
+            "y": 450,
+            "w": 659,
+            "h": 14,
+            "type": "solid"
+        },
+        {
+            "x": 1282,
+            "y": 300,
+            "w": 286,
+            "h": 95,
+            "type": "solid"
+        },
+        {
+            "x": 1109,
+            "y": 164,
+            "w": 191,
+            "h": 86,
+            "type": "solid"
+        },
+        {
+            "x": 532,
+            "y": 314,
+            "w": 268,
+            "h": 9,
+            "type": "solid"
+        }
+    ],
+    "wall_jump_zones": [
+        {
+            "x": 232,
+            "y": 250,
+            "w": 77,
+            "h": 82,
+            "side": "right"
+        },
+        {
+            "x": 259,
+            "y": 455,
+            "w": 127,
+            "h": 68,
+            "side": "right"
+        }
+    ],
+    "climb_surfaces": [],
+    "special_zones": [],
+    "interactive_objects": [
+        {
+            "id": "barrel_1772283075959",
+            "type": "explosive_barrel",
+            "x": 586,
+            "y": 268,
+            "w": 32,
+            "h": 48,
+            "hp": 40,
+            "explosion_radius": 120,
+            "explosion_damage": 60,
+            "respawn_time": 30
+        },
+        {
+            "id": "barrel_1772283076287",
+            "type": "explosive_barrel",
+            "x": 841,
+            "y": 195,
+            "w": 32,
+            "h": 48,
+            "hp": 40,
+            "explosion_radius": 120,
+            "explosion_damage": 60,
+            "respawn_time": 30
+        },
+        {
+            "id": "barrel_1772283076816",
+            "type": "explosive_barrel",
+            "x": 955,
+            "y": 400,
+            "w": 32,
+            "h": 48,
+            "hp": 40,
+            "explosion_radius": 120,
+            "explosion_damage": 60,
+            "respawn_time": 30
+        }
+    ]
+}

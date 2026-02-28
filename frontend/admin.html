@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WolfTeam2D — Admin Panel</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --bg:#0a0c10;--panel:#111520;--panel2:#181e2a;--border:#1e2a3a;
+    --accent:#4f8ef7;--red:#e05555;--green:#3ecf6e;--yellow:#f5c842;--purple:#9b6ef7;
+    --light:#cdd6f4;--dim:#6c7a94;--font:'Segoe UI',system-ui,sans-serif
+  }
+  body{background:var(--bg);color:var(--light);font-family:var(--font);display:flex;height:100vh;overflow:hidden}
+
+  /* ── Sidebar ── */
+  #sidebar{width:220px;min-width:220px;background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 0}
+  #sidebar .logo{padding:0 16px 16px;font-size:1.1rem;font-weight:700;color:var(--accent);border-bottom:1px solid var(--border);margin-bottom:8px}
+  #sidebar .logo span{color:var(--red)}
+  .nav-item{padding:10px 20px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:0.88rem;color:var(--dim);border-left:3px solid transparent;transition:.15s}
+  .nav-item:hover{background:var(--panel2);color:var(--light)}
+  .nav-item.active{background:var(--panel2);color:var(--accent);border-left-color:var(--accent)}
+  .nav-item .ico{width:18px;text-align:center}
+  #sidebar-footer{margin-top:auto;padding:12px 16px;border-top:1px solid var(--border);font-size:0.75rem;color:var(--dim)}
+  #ws-status{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:6px}
+
+  /* ── Main ── */
+  #main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+  #topbar{background:var(--panel);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between}
+  #topbar h2{font-size:1rem;font-weight:600}
+  #content{flex:1;overflow-y:auto;padding:20px}
+
+  /* ── Login Screen ── */
+  #login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:100}
+  .login-box{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:32px;width:360px}
+  .login-box h2{text-align:center;margin-bottom:24px;color:var(--accent)}
+
+  /* ── Cards & Grid ── */
+  .stat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-bottom:20px}
+  .stat-card{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:16px}
+  .stat-card .val{font-size:1.8rem;font-weight:700;color:var(--accent)}
+  .stat-card .lbl{font-size:0.75rem;color:var(--dim);margin-top:4px}
+  .card{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:16px;margin-bottom:16px}
+  .card h3{font-size:0.9rem;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+
+  /* ── Table ── */
+  .tbl{width:100%;border-collapse:collapse;font-size:0.82rem}
+  .tbl th{background:var(--panel);color:var(--dim);font-weight:600;padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+  .tbl td{padding:8px 10px;border-bottom:1px solid var(--border)}
+  .tbl tr:hover td{background:rgba(79,142,247,.05)}
+  .badge{display:inline-block;padding:2px 7px;border-radius:4px;font-size:0.72rem;font-weight:700}
+  .badge.banned{background:rgba(224,85,85,.2);color:var(--red)}
+  .badge.admin{background:rgba(155,110,247,.2);color:var(--purple)}
+  .badge.online{background:rgba(62,207,110,.2);color:var(--green)}
+  .badge.tdm{background:rgba(79,142,247,.2);color:var(--accent)}
+  .badge.ctf{background:rgba(245,200,66,.2);color:var(--yellow)}
+  .badge.wolf{background:rgba(224,85,85,.2);color:var(--red)}
+
+  /* ── Inputs & Buttons ── */
+  input,select,textarea{background:var(--panel);border:1px solid var(--border);color:var(--light);border-radius:6px;padding:8px 10px;font-size:0.85rem;width:100%;outline:none}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+  .btn{padding:7px 14px;border-radius:6px;border:none;cursor:pointer;font-size:0.82rem;font-weight:600;transition:.15s}
+  .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{filter:brightness(1.15)}
+  .btn-danger{background:var(--red);color:#fff}.btn-danger:hover{filter:brightness(1.15)}
+  .btn-success{background:var(--green);color:#000}.btn-success:hover{filter:brightness(1.1)}
+  .btn-warn{background:var(--yellow);color:#000}.btn-warn:hover{filter:brightness(1.1)}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--dim)}.btn-ghost:hover{color:var(--light);border-color:var(--light)}
+  .btn-sm{padding:4px 10px;font-size:0.76rem}
+  .row{display:flex;gap:8px;align-items:center}
+  .form-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
+  .form-row label{font-size:0.75rem;color:var(--dim);display:block;margin-bottom:3px}
+  .form-row .fld{flex:1;min-width:120px}
+  .pagination{display:flex;gap:6px;align-items:center;margin-top:12px;font-size:0.82rem}
+  .notif{position:fixed;top:20px;right:20px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;font-size:0.85rem;z-index:999;max-width:320px;transform:translateX(120%);transition:.3s}
+  .notif.show{transform:none}
+  .notif.ok{border-color:var(--green);color:var(--green)}
+  .notif.err{border-color:var(--red);color:var(--red)}
+
+  /* ── Map Editor ── */
+  #map-canvas-wrap{position:relative;overflow:auto;background:#070a0f;border:1px solid var(--border);border-radius:8px;max-height:500px}
+  #map-canvas{display:block;cursor:crosshair}
+  .map-tool-btn{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--panel);color:var(--dim);cursor:pointer;font-size:0.8rem}
+  .map-tool-btn.active{border-color:var(--accent);color:var(--accent);background:rgba(79,142,247,.12)}
+  .spawn-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .spawn-item{background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:0.75rem;display:flex;gap:6px;align-items:center}
+  .spawn-item.red{border-color:rgba(224,85,85,.4)}
+  .spawn-item.blue{border-color:rgba(79,142,247,.4)}
+  #map-json{height:220px;font-family:monospace;font-size:0.76rem;resize:vertical}
+
+  /* ── Scrollbar ── */
+  ::-webkit-scrollbar{width:6px;height:6px}
+  ::-webkit-scrollbar-track{background:var(--panel)}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="login-screen">
+  <div class="login-box">
+    <h2>🐺 Admin Panel</h2>
+    <div style="margin-bottom:12px"><label style="font-size:.75rem;color:var(--dim);display:block;margin-bottom:4px">Username</label><input id="a-user" placeholder="admin"></div>
+    <div style="margin-bottom:16px"><label style="font-size:.75rem;color:var(--dim);display:block;margin-bottom:4px">Password</label><input id="a-pass" type="password" placeholder="••••••"></div>
+    <button class="btn btn-primary" style="width:100%" onclick="adminLogin()">Login</button>
+    <div id="login-err" style="color:var(--red);font-size:.8rem;text-align:center;margin-top:10px"></div>
+    <div style="margin-top:16px;font-size:.75rem;color:var(--dim);text-align:center">Server: <input id="a-host" value="localhost:8080" style="width:160px;display:inline-block;padding:3px 6px;font-size:.75rem"></div>
+  </div>
+</div>
+
+<!-- Sidebar -->
+<div id="sidebar">
+  <div class="logo">Wolf<span>Team2D</span> <span style="font-size:.7rem;color:var(--dim)">Admin</span></div>
+  <div class="nav-item active" onclick="showTab('dashboard')" id="nav-dashboard"><span class="ico">📊</span>Dashboard</div>
+  <div class="nav-item" onclick="showTab('players')" id="nav-players"><span class="ico">👥</span>Players</div>
+  <div class="nav-item" onclick="showTab('rooms')" id="nav-rooms"><span class="ico">🎮</span>Active Rooms</div>
+  <div class="nav-item" onclick="showTab('maps')" id="nav-maps"><span class="ico">🗺️</span>Map Manager</div>
+  <div class="nav-item" onclick="showTab('broadcast')" id="nav-broadcast"><span class="ico">📢</span>Broadcast</div>
+  <div id="sidebar-footer"><span id="ws-status"></span><span id="auth-user">Not connected</span></div>
+</div>
+
+<!-- Main -->
+<div id="main">
+  <div id="topbar">
+    <h2 id="page-title">Dashboard</h2>
+    <div class="row" style="gap:10px">
+      <span id="online-badge" style="font-size:.8rem;color:var(--green)">● 0 online</span>
+      <button class="btn btn-ghost btn-sm" onclick="refreshAll()">↻ Refresh</button>
+    </div>
+  </div>
+  <div id="content">
+
+    <!-- ═══ DASHBOARD ═══ -->
+    <div id="tab-dashboard">
+      <div class="stat-grid" id="stat-grid">
+        <div class="stat-card"><div class="val" id="s-players">—</div><div class="lbl">Total Players</div></div>
+        <div class="stat-card"><div class="val" id="s-online">—</div><div class="lbl">Online Now</div></div>
+        <div class="stat-card"><div class="val" id="s-rooms">—</div><div class="lbl">Active Rooms</div></div>
+        <div class="stat-card"><div class="val" id="s-banned">—</div><div class="lbl">Banned</div></div>
+        <div class="stat-card"><div class="val" id="s-kills">—</div><div class="lbl">Total Kills</div></div>
+        <div class="stat-card"><div class="val" id="s-wins">—</div><div class="lbl">Total Wins</div></div>
+        <div class="stat-card"><div class="val" id="s-coins">—</div><div class="lbl">Coins in Circulation</div></div>
+      </div>
+      <div class="card">
+        <h3>📋 Active Rooms</h3>
+        <div id="dash-rooms">Loading...</div>
+      </div>
+    </div>
+
+    <!-- ═══ PLAYERS ═══ -->
+    <div id="tab-players" style="display:none">
+      <div class="form-row">
+        <div class="fld"><label>Search Username</label><input id="pl-search" placeholder="Search..." oninput="loadPlayers()"></div>
+        <button class="btn btn-primary" onclick="loadPlayers()">🔍 Search</button>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden">
+        <table class="tbl">
+          <thead><tr><th>ID</th><th>Username</th><th>Status</th><th>Kills</th><th>Wins</th><th>ELO</th><th>Coins</th><th>XP</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody id="pl-tbody"></tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <button class="btn btn-ghost btn-sm" onclick="plPage(-1)">◀ Prev</button>
+        <span id="pl-page-info">Page 1</span>
+        <button class="btn btn-ghost btn-sm" onclick="plPage(1)">Next ▶</button>
+      </div>
+
+      <!-- Player Detail Modal -->
+      <div id="pl-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:50;display:none;align-items:center;justify-content:center">
+        <div style="background:var(--panel2);border:1px solid var(--border);border-radius:12px;width:480px;max-width:95vw;padding:24px;max-height:90vh;overflow-y:auto">
+          <div style="display:flex;justify-content:space-between;margin-bottom:16px">
+            <h3 style="color:var(--accent)" id="pl-modal-title">Player Details</h3>
+            <button class="btn btn-ghost btn-sm" onclick="closePlModal()">✕</button>
+          </div>
+          <div id="pl-modal-body"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px" id="pl-modal-actions"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ ROOMS ═══ -->
+    <div id="tab-rooms" style="display:none">
+      <div id="rooms-list">Loading...</div>
+    </div>
+
+    <!-- ═══ MAPS ═══ -->
+    <div id="tab-maps" style="display:none">
+      <div style="display:flex;gap:12px;height:calc(100vh - 120px);overflow:hidden">
+        <!-- Left: Map List -->
+        <div style="width:240px;min-width:240px;display:flex;flex-direction:column;gap:8px;overflow-y:auto">
+          <button class="btn btn-success btn-sm" onclick="newMap()">+ New Map</button>
+          <div id="map-list-panel"></div>
+        </div>
+        <!-- Right: Editor -->
+        <div style="flex:1;overflow-y:auto">
+          <div id="map-editor-panel">
+            <div style="color:var(--dim);text-align:center;margin-top:80px">← Select a map to edit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ BROADCAST ═══ -->
+    <div id="tab-broadcast" style="display:none">
+      <div class="card">
+        <h3>📢 Server-Wide Announcement</h3>
+        <textarea id="bc-msg" style="height:100px;resize:vertical;margin-bottom:10px" placeholder="Message to all online players..."></textarea>
+        <button class="btn btn-warn" onclick="sendBroadcast()">📡 Send to All Players</button>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<div class="notif" id="notif"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+//  State
+// ═══════════════════════════════════════════════════════
+let ws=null, authed=false;
+let plOffset=0, plLimit=50;
+let currentMapId=null, editingMap=null;
+let mapTool='spawn_red'; // active tool
+let canvasScale=0.18;
+
+// ═══════════════════════════════════════════════════════
+//  WebSocket
+// ═══════════════════════════════════════════════════════
+function connect(host){
+  if(ws){try{ws.close()}catch(e){}}
+  ws=new WebSocket('ws://'+host);
+  ws.onopen=()=>{ setWS(true); };
+  ws.onclose=()=>{ setWS(false); authed=false; document.getElementById('login-screen').style.display='flex'; };
+  ws.onerror=()=>setWS(false);
+  ws.onmessage=e=>{
+    let d; try{d=JSON.parse(e.data)}catch(ex){return}
+    handlers[d.type]?.(d);
+  };
+}
+function send(obj){ if(ws&&ws.readyState===1) ws.send(JSON.stringify(obj)); }
+function setWS(ok){
+  document.getElementById('ws-status').style.background=ok?'var(--green)':'var(--red)';
+}
+
+const handlers={
+  error:(d)=>notif(d.message,'err'),
+  admin_auth_ok:(d)=>{
+    authed=true;
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('auth-user').textContent=d.username;
+    notif('Welcome, '+d.username,'ok');
+  },
+  admin_stats:(d)=>renderStats(d.stats),
+  admin_players:(d)=>renderPlayers(d),
+  admin_rooms:(d)=>renderRooms(d.rooms),
+  admin_maps:(d)=>renderMapList(d.maps),
+  admin_maps_reloaded:(d)=>{ notif('Maps reloaded: '+d.count+' maps','ok'); renderMapList(d.maps); },
+  admin_ok:(d)=>{ notif('✔ Action: '+d.action,'ok'); refreshAll(); },
+  kicked:(d)=>notif('Kicked: '+(d.reason||''),'err'),
+};
+
+// ═══════════════════════════════════════════════════════
+//  Login
+// ═══════════════════════════════════════════════════════
+function adminLogin(){
+  const host=document.getElementById('a-host').value.trim();
+  const u=document.getElementById('a-user').value.trim();
+  const p=document.getElementById('a-pass').value;
+  if(!u||!p){document.getElementById('login-err').textContent='Fill all fields';return;}
+  connect(host);
+  const wait=setInterval(()=>{
+    if(ws&&ws.readyState===1){ clearInterval(wait); send({type:'admin_login',username:u,password:p}); }
+    if(ws&&ws.readyState===3){ clearInterval(wait); document.getElementById('login-err').textContent='Cannot connect to server'; }
+  },100);
+}
+document.getElementById('a-pass').addEventListener('keydown',e=>{if(e.key==='Enter')adminLogin();});
+
+// ═══════════════════════════════════════════════════════
+//  Nav / Tabs
+// ═══════════════════════════════════════════════════════
+function showTab(name){
+  ['dashboard','players','rooms','maps','broadcast'].forEach(t=>{
+    document.getElementById('tab-'+t).style.display=t===name?'block':'none';
+    document.getElementById('nav-'+t).classList.toggle('active',t===name);
+  });
+  document.getElementById('page-title').textContent={
+    dashboard:'Dashboard',players:'Players',rooms:'Active Rooms',maps:'Map Manager',broadcast:'Broadcast'
+  }[name];
+  if(name==='players') loadPlayers();
+  if(name==='rooms') send({type:'admin_get_rooms'});
+  if(name==='maps') send({type:'admin_get_maps'});
+  if(name==='dashboard'){ send({type:'admin_get_stats'}); send({type:'admin_get_rooms'}); }
+}
+
+function refreshAll(){
+  if(!authed) return;
+  send({type:'admin_get_stats'});
+  send({type:'admin_get_rooms'});
+}
+
+// ═══════════════════════════════════════════════════════
+//  Dashboard
+// ═══════════════════════════════════════════════════════
+function renderStats(s){
+  document.getElementById('s-players').textContent=s.total_players??'—';
+  document.getElementById('s-online').textContent=s.online_players??'—';
+  document.getElementById('s-rooms').textContent=s.active_rooms??'—';
+  document.getElementById('s-banned').textContent=s.banned??'—';
+  document.getElementById('s-kills').textContent=fmt(s.total_kills??0);
+  document.getElementById('s-wins').textContent=fmt(s.total_wins??0);
+  document.getElementById('s-coins').textContent=fmt(s.total_coins??0);
+  document.getElementById('online-badge').textContent='● '+(s.online_players??0)+' online';
+}
+function fmt(n){return n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(n);}
+
+// ═══════════════════════════════════════════════════════
+//  Players
+// ═══════════════════════════════════════════════════════
+function loadPlayers(){
+  plOffset=0;
+  const search=document.getElementById('pl-search').value.trim();
+  send({type:'admin_get_players',limit:plLimit,offset:plOffset,search});
+}
+function plPage(dir){
+  plOffset=Math.max(0,plOffset+dir*plLimit);
+  const search=document.getElementById('pl-search').value.trim();
+  send({type:'admin_get_players',limit:plLimit,offset:plOffset,search});
+}
+function renderPlayers(d){
+  const tbody=document.getElementById('pl-tbody');
+  tbody.innerHTML=d.players.map(p=>`
+    <tr>
+      <td style="color:var(--dim)">${p.id}</td>
+      <td>
+        <strong>${esc(p.username)}</strong>
+        ${p.is_admin?'<span class="badge admin">ADMIN</span>':''}
+      </td>
+      <td>
+        ${p.is_banned?'<span class="badge banned">BANNED</span>':p.online?'<span class="badge online">ONLINE</span>':'<span style="color:var(--dim);font-size:.75rem">offline</span>'}
+      </td>
+      <td>${p.kills??0}</td>
+      <td>${p.wins??0}</td>
+      <td style="color:var(--yellow)">${p.elo??1000}</td>
+      <td style="color:var(--green)">${p.coins??0}</td>
+      <td>${fmt(p.xp??0)}</td>
+      <td style="color:var(--dim);font-size:.75rem">${p.created_at?new Date(p.created_at*1000).toLocaleDateString():'-'}</td>
+      <td>
+        <button class="btn btn-ghost btn-sm" onclick="openPlayer(${JSON.stringify(p).replace(/"/g,'&quot;')})">⚙</button>
+      </td>
+    </tr>`).join('');
+  const page=Math.floor(plOffset/plLimit)+1;
+  const total=Math.ceil(d.total/plLimit);
+  document.getElementById('pl-page-info').textContent=`Page ${page} / ${total} (${d.total} total)`;
+}
+
+let _selPlayer=null;
+function openPlayer(p){
+  _selPlayer=p;
+  document.getElementById('pl-modal-title').textContent=p.username+' #'+p.id;
+  document.getElementById('pl-modal-body').innerHTML=`
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.83rem;margin-bottom:12px">
+      <div><span style="color:var(--dim)">Kills:</span> ${p.kills}</div>
+      <div><span style="color:var(--dim)">Deaths:</span> ${p.deaths}</div>
+      <div><span style="color:var(--dim)">Wins:</span> ${p.wins}</div>
+      <div><span style="color:var(--dim)">Losses:</span> ${p.losses}</div>
+      <div><span style="color:var(--dim)">ELO:</span> ${p.elo}</div>
+      <div><span style="color:var(--dim)">Rank:</span> ${p.rank_tier}</div>
+      <div><span style="color:var(--dim)">XP:</span> ${p.xp}</div>
+      <div><span style="color:var(--dim)">BP Level:</span> ${p.bp_level}</div>
+      <div><span style="color:var(--dim)">Coins:</span> ${p.coins}</div>
+      <div><span style="color:var(--dim)">Wolf Kills:</span> ${p.wolf_kills}</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div class="form-row">
+        <div class="fld"><label>Give Coins</label><input id="pm-give-coins" type="number" placeholder="Amount" min="0"></div>
+        <button class="btn btn-success btn-sm" onclick="pmGiveCoins()">Give</button>
+      </div>
+      <div class="form-row">
+        <div class="fld"><label>Set Coins Exact</label><input id="pm-set-coins" type="number" placeholder="Amount" min="0"></div>
+        <button class="btn btn-warn btn-sm" onclick="pmSetCoins()">Set</button>
+      </div>
+    </div>`;
+  const acts=document.getElementById('pl-modal-actions');
+  acts.innerHTML=`
+    <button class="btn btn-danger btn-sm" onclick="pmBan()">${p.is_banned?'🔓 Unban':'🚫 Ban'}</button>
+    <button class="btn btn-warn btn-sm" onclick="pmResetStats()">↺ Reset Stats</button>
+    <button class="btn ${p.is_admin?'btn-ghost':'btn-primary'} btn-sm" onclick="pmToggleAdmin()">${p.is_admin?'Remove Admin':'Make Admin'}</button>
+    <button class="btn btn-danger btn-sm" onclick="pmDelete()">🗑 Delete Account</button>
+    ${p.online?`<button class="btn btn-ghost btn-sm" onclick="pmKick()">👢 Kick</button>`:''}`;
+  document.getElementById('pl-modal').style.display='flex';
+}
+function closePlModal(){ document.getElementById('pl-modal').style.display='none'; }
+function pmBan(){ if(!_selPlayer) return; send({type:'admin_ban',id:_selPlayer.id,ban:!_selPlayer.is_banned}); closePlModal(); }
+function pmResetStats(){ if(!_selPlayer||!confirm('Reset all stats for '+_selPlayer.username+'?')) return; send({type:'admin_reset_stats',id:_selPlayer.id}); closePlModal(); }
+function pmToggleAdmin(){ if(!_selPlayer) return; send({type:'admin_set_admin',id:_selPlayer.id,value:!_selPlayer.is_admin}); closePlModal(); }
+function pmDelete(){ if(!_selPlayer||!confirm('DELETE account: '+_selPlayer.username+'? This cannot be undone!')) return; send({type:'admin_delete_acc',id:_selPlayer.id}); closePlModal(); }
+function pmKick(){ if(!_selPlayer) return; const pid=prompt('Player socket ID?',''); send({type:'admin_kick_player',player_id:pid||'',reason:'Kicked by admin'}); closePlModal(); }
+function pmGiveCoins(){ if(!_selPlayer) return; const c=parseInt(document.getElementById('pm-give-coins').value); if(!c) return; send({type:'admin_give_coins',id:_selPlayer.id,coins:c}); closePlModal(); }
+function pmSetCoins(){ if(!_selPlayer) return; const c=parseInt(document.getElementById('pm-set-coins').value); if(isNaN(c)) return; send({type:'admin_set_coins',id:_selPlayer.id,coins:c}); closePlModal(); }
+
+// ═══════════════════════════════════════════════════════
+//  Rooms
+// ═══════════════════════════════════════════════════════
+function renderRooms(rooms){
+  const el=document.getElementById('rooms-list');
+  const dashEl=document.getElementById('dash-rooms');
+  if(!rooms.length){
+    const html='<div style="color:var(--dim);padding:20px;text-align:center">No active rooms</div>';
+    if(el) el.innerHTML=html; if(dashEl) dashEl.innerHTML=html; return;
+  }
+  const html=rooms.map(r=>`
+    <div class="card" style="margin-bottom:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+        <div>
+          <strong>${esc(r.name)}</strong>
+          <span class="badge ${r.mode}" style="margin-left:6px">${r.mode.toUpperCase()}</span>
+          ${r.private?'<span class="badge" style="background:rgba(155,110,247,.2);color:var(--purple);margin-left:4px">PRIVATE</span>':''}
+          ${r.map_id?`<span style="color:var(--dim);font-size:.75rem;margin-left:6px">🗺 ${esc(r.map_name||r.map_id)}</span>`:''}
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-danger btn-sm" onclick="closeRoom('${r.id}')">🗑 Close</button>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:.8rem;color:var(--dim)">
+        👥 ${r.total}/${r.total} players &nbsp;|&nbsp;
+        State: <span style="color:${r.state==='playing'?'var(--green)':'var(--yellow)'}">${r.state}</span> &nbsp;|&nbsp;
+        🔴 ${r.red} red &nbsp;|&nbsp; 🔵 ${r.blue} blue
+      </div>
+      <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px">
+        ${(r.players||[]).map(p=>`<span class="badge ${p.team||'dim'}" style="font-size:.72rem">${esc(p.name)}${p.ready?'✓':''}</span>`).join('')}
+      </div>
+    </div>`).join('');
+  if(el) el.innerHTML=html;
+  if(dashEl) dashEl.innerHTML=html;
+}
+function closeRoom(id){ if(!confirm('Close this room?')) return; send({type:'admin_close_room',room_id:id,reason:'Closed by admin'}); }
+
+// ═══════════════════════════════════════════════════════
+//  Map Manager
+// ═══════════════════════════════════════════════════════
+let allMaps=[];
+function renderMapList(maps){
+  allMaps=maps;
+  const el=document.getElementById('map-list-panel');
+  el.innerHTML=maps.map(m=>`
+    <div class="card" style="cursor:pointer;padding:10px;margin-bottom:6px;border-color:${currentMapId===m.id?'var(--accent)':'var(--border)'}" onclick="selectMap('${m.id}')">
+      <div style="font-weight:700;font-size:.85rem">${esc(m.name)}</div>
+      <div style="font-size:.72rem;color:var(--dim);margin-top:2px">${(m.modes||[]).join('/')}</div>
+      <div style="font-size:.7rem;color:var(--dim);margin-top:2px">▶ ${(m.stats?.play_count)||0} plays</div>
+    </div>`).join('');
+  // Reload selected map editor if open
+  if(currentMapId){ const m=maps.find(x=>x.id===currentMapId); if(m) openMapEditor(m); }
+}
+function selectMap(id){
+  const m=allMaps.find(x=>x.id===id);
+  if(!m) return;
+  currentMapId=id;
+  openMapEditor(m);
+  // Re-render list to show selection
+  renderMapList(allMaps);
+}
+function newMap(){
+  const id='new_map_'+Date.now();
+  const m={
+    id,name:'New Map',description:'',thumbnail:'',modes:['tdm'],
+    width:2400,height:600,background:'bg_default',music:'',
+    spawns:{red:[{x:80,y:560}],blue:[{x:2320,y:560}]},
+    ctf_flags:{red:{x:80,y:560,baseX:80,baseY:560},blue:{x:2320,y:560,baseX:2320,baseY:560}},
+    platforms:[{x:0,y:560,w:2400,h:40,type:'solid'}],
+    wall_jump_zones:[],climb_surfaces:[],special_zones:[],interactive_objects:[]
+  };
+  allMaps.push(m); currentMapId=id; renderMapList(allMaps); openMapEditor(m);
+}
+function openMapEditor(m){
+  editingMap=JSON.parse(JSON.stringify(m));
+  const el=document.getElementById('map-editor-panel');
+  el.innerHTML=`
+    <div class="card">
+      <h3>🗺️ Map Info</h3>
+      <div class="form-row">
+        <div class="fld"><label>ID (slug)</label><input id="me-id" value="${esc(m.id)}"></div>
+        <div class="fld"><label>Name</label><input id="me-name" value="${esc(m.name)}"></div>
+      </div>
+      <div class="form-row">
+        <div class="fld" style="flex:2"><label>Description</label><input id="me-desc" value="${esc(m.description||'')}"></div>
+      </div>
+      <div class="form-row">
+        <div class="fld"><label>Width</label><input id="me-w" type="number" value="${m.width||2400}"></div>
+        <div class="fld"><label>Height</label><input id="me-h" type="number" value="${m.height||600}"></div>
+      </div>
+      <div class="form-row">
+        <div class="fld"><label>Modes</label>
+          <div style="display:flex;gap:6px;margin-top:4px">
+            ${['tdm','ctf','wolf'].map(md=>`<label style="display:flex;align-items:center;gap:4px;font-size:.8rem;cursor:pointer"><input type="checkbox" id="me-mode-${md}" style="width:auto" ${(m.modes||[]).includes(md)?'checked':''}>${md.toUpperCase()}</label>`).join('')}
+          </div>
+        </div>
+        <div class="fld"><label>Background</label><input id="me-bg" value="${esc(m.background||'')}"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>🖊 Visual Editor
+        <span style="margin-left:auto;display:flex;gap:4px">
+          <button class="map-tool-btn ${mapTool==='spawn_red'?'active':''}" onclick="setTool('spawn_red')">🔴 Red Spawn</button>
+          <button class="map-tool-btn ${mapTool==='spawn_blue'?'active':''}" onclick="setTool('spawn_blue')">🔵 Blue Spawn</button>
+          <button class="map-tool-btn ${mapTool==='platform'?'active':''}" onclick="setTool('platform')">⬛ Platform</button>
+          <button class="map-tool-btn ${mapTool==='walljump'?'active':''}" onclick="setTool('walljump')">⬆ WallJump</button>
+          <button class="map-tool-btn ${mapTool==='interactive'?'active':''}" onclick="setTool('interactive')">💥 Object</button>
+          <button class="map-tool-btn ${mapTool==='erase'?'active':''}" onclick="setTool('erase')">🗑 Erase</button>
+        </span>
+      </h3>
+      <div style="font-size:.75rem;color:var(--dim);margin-bottom:6px">
+        ${mapTool==='spawn_red'?'Click to add Red spawn point':
+          mapTool==='spawn_blue'?'Click to add Blue spawn point':
+          mapTool==='platform'?'Click & drag to draw platform':
+          mapTool==='walljump'?'Click & drag to mark wall-jump zone':
+          mapTool==='interactive'?'Click to place explosive barrel':
+          'Click on objects/spawns to remove them'}
+        &nbsp;|&nbsp; Zoom: <input type="range" min="5" max="50" value="${Math.round(canvasScale*100)}" style="width:80px;display:inline-block;vertical-align:middle" oninput="canvasScale=this.value/100;drawCanvas()">
+      </div>
+      <div id="map-canvas-wrap">
+        <canvas id="map-canvas"></canvas>
+      </div>
+      <div style="margin-top:8px">
+        <strong style="font-size:.8rem">🔴 Red Spawns:</strong>
+        <div class="spawn-list" id="me-red-spawns"></div>
+        <strong style="font-size:.8rem;margin-top:8px;display:block">🔵 Blue Spawns:</strong>
+        <div class="spawn-list" id="me-blue-spawns"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>📝 Raw JSON Editor <span style="font-size:.75rem;color:var(--dim);margin-left:8px">(edit & apply)</span></h3>
+      <textarea id="map-json">${JSON.stringify(editingMap,null,2)}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn btn-primary" onclick="applyJson()">↑ Apply JSON</button>
+        <button class="btn btn-ghost" onclick="syncJson()">↓ Sync from Visual</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <button class="btn btn-success" onclick="saveMap()">💾 Save Map</button>
+      <button class="btn btn-ghost" onclick="send({type:'admin_reload_maps'})">↻ Reload All Maps</button>
+    </div>
+  `;
+  initCanvas();
+  renderSpawnLists();
+}
+function setTool(t){
+  mapTool=t;
+  // Re-render tool buttons
+  document.querySelectorAll('.map-tool-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  drawCanvas();
+}
+function renderSpawnLists(){
+  if(!editingMap) return;
+  const redEl=document.getElementById('me-red-spawns');
+  const blueEl=document.getElementById('me-blue-spawns');
+  if(!redEl||!blueEl) return;
+  redEl.innerHTML=(editingMap.spawns?.red||[]).map((s,i)=>`
+    <div class="spawn-item red">🔴 (${s.x},${s.y}) <button style="background:none;border:none;color:var(--red);cursor:pointer;padding:0;font-size:.75rem" onclick="removeSpawn('red',${i})">✕</button></div>`).join('');
+  blueEl.innerHTML=(editingMap.spawns?.blue||[]).map((s,i)=>`
+    <div class="spawn-item blue">🔵 (${s.x},${s.y}) <button style="background:none;border:none;color:var(--accent);cursor:pointer;padding:0;font-size:.75rem" onclick="removeSpawn('blue',${i})">✕</button></div>`).join('');
+}
+function removeSpawn(team,idx){
+  if(!editingMap.spawns?.[team]) return;
+  editingMap.spawns[team].splice(idx,1);
+  renderSpawnLists(); drawCanvas(); syncJson();
+}
+
+// ── Canvas ──
+let isDragging=false, dragStart={x:0,y:0}, dragRect=null;
+function initCanvas(){
+  const wrap=document.getElementById('map-canvas-wrap');
+  const canvas=document.getElementById('map-canvas');
+  if(!canvas||!editingMap) return;
+  canvas.width=Math.round(editingMap.width*canvasScale);
+  canvas.height=Math.round(editingMap.height*canvasScale);
+  drawCanvas();
+  canvas.onmousedown=e=>{ const pos=canvasPos(e,canvas); isDragging=true; dragStart=pos; dragRect=null; };
+  canvas.onmousemove=e=>{
+    if(!isDragging) return;
+    const pos=canvasPos(e,canvas);
+    if(['platform','walljump','interactive'].includes(mapTool)){
+      dragRect={x:Math.min(dragStart.x,pos.x),y:Math.min(dragStart.y,pos.y),w:Math.abs(pos.x-dragStart.x),h:Math.abs(pos.y-dragStart.y)};
+      drawCanvas(dragRect);
+    }
+  };
+  canvas.onmouseup=e=>{
+    if(!isDragging) return; isDragging=false;
+    const pos=canvasPos(e,canvas);
+    handleCanvasClick(dragStart,pos,dragRect); dragRect=null; drawCanvas();
+  };
+  canvas.onmouseleave=()=>{ isDragging=false; dragRect=null; drawCanvas(); };
+}
+function canvasPos(e,canvas){
+  const r=canvas.getBoundingClientRect();
+  return {x:Math.round((e.clientX-r.left)/canvasScale),y:Math.round((e.clientY-r.top)/canvasScale)};
+}
+function handleCanvasClick(start,end,rect){
+  if(!editingMap) return;
+  if(!editingMap.spawns) editingMap.spawns={red:[],blue:[]};
+  if(!editingMap.platforms) editingMap.platforms=[];
+  if(!editingMap.wall_jump_zones) editingMap.wall_jump_zones=[];
+  if(!editingMap.interactive_objects) editingMap.interactive_objects=[];
+  if(mapTool==='spawn_red'){ editingMap.spawns.red.push({x:start.x,y:start.y}); }
+  else if(mapTool==='spawn_blue'){ editingMap.spawns.blue.push({x:start.x,y:start.y}); }
+  else if(mapTool==='platform'&&rect&&rect.w>5&&rect.h>3){ editingMap.platforms.push({x:rect.x,y:rect.y,w:rect.w,h:rect.h,type:'solid'}); }
+  else if(mapTool==='walljump'&&rect&&rect.w>5&&rect.h>5){ editingMap.wall_jump_zones.push({x:rect.x,y:rect.y,w:rect.w,h:rect.h,side:'right'}); }
+  else if(mapTool==='interactive'){ editingMap.interactive_objects.push({id:'barrel_'+Date.now(),type:'explosive_barrel',x:start.x,y:start.y,w:32,h:48,hp:40,explosion_radius:120,explosion_damage:60,respawn_time:30}); }
+  else if(mapTool==='erase'){ eraseAt(start.x,start.y); }
+  renderSpawnLists(); syncJson(); drawCanvas();
+}
+function eraseAt(wx,wy){
+  if(!editingMap) return;
+  const tolerance=30;
+  // Remove spawn?
+  ['red','blue'].forEach(t=>{
+    if(!editingMap.spawns?.[t]) return;
+    editingMap.spawns[t]=editingMap.spawns[t].filter(s=>Math.abs(s.x-wx)>tolerance||Math.abs(s.y-wy)>tolerance);
+  });
+  // Remove platform?
+  editingMap.platforms=editingMap.platforms.filter(p=>!(wx>=p.x&&wx<=p.x+p.w&&wy>=p.y&&wy<=p.y+p.h));
+  editingMap.wall_jump_zones=(editingMap.wall_jump_zones||[]).filter(p=>!(wx>=p.x&&wx<=p.x+p.w&&wy>=p.y&&wy<=p.y+p.h));
+  editingMap.interactive_objects=(editingMap.interactive_objects||[]).filter(o=>Math.abs(o.x-wx)>tolerance||Math.abs(o.y-wy)>tolerance);
+}
+function drawCanvas(previewRect=null){
+  const canvas=document.getElementById('map-canvas');
+  if(!canvas||!editingMap) return;
+  canvas.width=Math.round(editingMap.width*canvasScale);
+  canvas.height=Math.round(editingMap.height*canvasScale);
+  const ctx=canvas.getContext('2d');
+  const s=canvasScale;
+  // BG
+  ctx.fillStyle='#0a0f1a'; ctx.fillRect(0,0,canvas.width,canvas.height);
+  // Grid
+  ctx.strokeStyle='#1a2030'; ctx.lineWidth=.5;
+  for(let x=0;x<=editingMap.width;x+=100){ctx.beginPath();ctx.moveTo(x*s,0);ctx.lineTo(x*s,canvas.height);ctx.stroke();}
+  for(let y=0;y<=editingMap.height;y+=100){ctx.beginPath();ctx.moveTo(0,y*s);ctx.lineTo(canvas.width,y*s);ctx.stroke();}
+  // Platforms
+  ctx.fillStyle='#3a4a6a';
+  (editingMap.platforms||[]).forEach(p=>{
+    if(p.type==='wall') ctx.fillStyle='#2a3a5a'; else ctx.fillStyle='#3a4a6a';
+    ctx.fillRect(p.x*s,p.y*s,p.w*s,p.h*s);
+    ctx.strokeStyle='#5a7aaa'; ctx.lineWidth=.5; ctx.strokeRect(p.x*s,p.y*s,p.w*s,p.h*s);
+    ctx.fillStyle='#3a4a6a';
+  });
+  // Wall jump zones
+  ctx.fillStyle='rgba(79,142,247,.15)'; ctx.strokeStyle='rgba(79,142,247,.5)'; ctx.lineWidth=1;
+  (editingMap.wall_jump_zones||[]).forEach(z=>{ ctx.fillRect(z.x*s,z.y*s,z.w*s,z.h*s); ctx.strokeRect(z.x*s,z.y*s,z.w*s,z.h*s); });
+  // Interactive objects
+  ctx.fillStyle='rgba(245,200,66,.8)';
+  (editingMap.interactive_objects||[]).forEach(o=>{ ctx.beginPath();ctx.arc((o.x+16)*s,(o.y+24)*s,8*s,0,Math.PI*2);ctx.fill(); });
+  // CTF flags
+  if(editingMap.ctf_flags?.red){ const f=editingMap.ctf_flags.red; ctx.fillStyle='#e05555'; ctx.fillRect(f.baseX*s-4,f.baseY*s-20,(8)*s,(20)*s); ctx.fillStyle='#ff8888'; ctx.fillRect(f.baseX*s,f.baseY*s-20,12*s,10*s); }
+  if(editingMap.ctf_flags?.blue){ const f=editingMap.ctf_flags.blue; ctx.fillStyle='#4f8ef7'; ctx.fillRect(f.baseX*s-4,f.baseY*s-20,8*s,20*s); ctx.fillStyle='#88aaff'; ctx.fillRect(f.baseX*s-12,f.baseY*s-20,12*s,10*s); }
+  // Spawns
+  const drawSpawn=(sx,sy,color)=>{ ctx.beginPath();ctx.arc(sx*s,sy*s,6*s,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=.5;ctx.stroke(); };
+  (editingMap.spawns?.red||[]).forEach(sp=>drawSpawn(sp.x,sp.y,'#e05555'));
+  (editingMap.spawns?.blue||[]).forEach(sp=>drawSpawn(sp.x,sp.y,'#4f8ef7'));
+  // Preview drag rect
+  if(previewRect&&previewRect.w>0){ ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=1; ctx.setLineDash([4,4]); ctx.strokeRect(previewRect.x*s,previewRect.y*s,previewRect.w*s,previewRect.h*s); ctx.setLineDash([]); }
+  // Cursor tool hint
+  ctx.fillStyle='rgba(255,255,255,.6)'; ctx.font=`${Math.max(8,12*s)}px monospace`;
+  ctx.fillText({spawn_red:'🔴',spawn_blue:'🔵',platform:'⬛',walljump:'⬆',interactive:'💥',erase:'🗑'}[mapTool]||'',6,14);
+}
+
+function syncJson(){
+  const el=document.getElementById('map-json');
+  if(el) el.value=JSON.stringify(editingMap,null,2);
+}
+function applyJson(){
+  const el=document.getElementById('map-json');
+  if(!el) return;
+  try{
+    editingMap=JSON.parse(el.value);
+    renderSpawnLists(); drawCanvas();
+    notif('JSON applied','ok');
+  }catch(e){ notif('Invalid JSON: '+e.message,'err'); }
+}
+function saveMap(){
+  if(!editingMap) return;
+  // Sync from form fields first
+  editingMap.id=document.getElementById('me-id')?.value||editingMap.id;
+  editingMap.name=document.getElementById('me-name')?.value||editingMap.name;
+  editingMap.description=document.getElementById('me-desc')?.value||'';
+  editingMap.width=parseInt(document.getElementById('me-w')?.value)||editingMap.width;
+  editingMap.height=parseInt(document.getElementById('me-h')?.value)||editingMap.height;
+  editingMap.background=document.getElementById('me-bg')?.value||'';
+  editingMap.modes=['tdm','ctf','wolf'].filter(md=>document.getElementById('me-mode-'+md)?.checked);
+  send({type:'admin_save_map',map:editingMap});
+}
+
+// ═══════════════════════════════════════════════════════
+//  Broadcast
+// ═══════════════════════════════════════════════════════
+function sendBroadcast(){
+  const msg=document.getElementById('bc-msg').value.trim();
+  if(!msg){notif('Empty message','err');return;}
+  if(!confirm('Send to ALL players: "'+msg+'"?')) return;
+  send({type:'admin_broadcast',message:msg});
+  document.getElementById('bc-msg').value='';
+}
+
+// ═══════════════════════════════════════════════════════
+//  Utils
+// ═══════════════════════════════════════════════════════
+function notif(msg,type='ok'){
+  const el=document.getElementById('notif');
+  el.textContent=msg; el.className='notif show '+(type==='ok'?'ok':'err');
+  clearTimeout(notif._t); notif._t=setTimeout(()=>el.classList.remove('show'),3000);
+}
+function esc(s){ const d=document.createElement('div');d.appendChild(document.createTextNode(String(s)));return d.innerHTML; }
+
+// ═══════════════════════════════════════════════════════
+//  Auto-refresh
+// ═══════════════════════════════════════════════════════
+setInterval(()=>{ if(authed){ send({type:'admin_get_stats'}); send({type:'admin_get_rooms'}); } }, 10000);
+</script>
+</body>
+</html>

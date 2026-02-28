@@ -1,0 +1,195 @@
+{
+  "id": "neon_city",
+  "name": "Neon City",
+  "description": "Simetrik şehir haritası. CTF için optimize edilmiş. Yüksek binaları atlayarak hızlı geçiş.",
+  "thumbnail": "assets/maps/thumbs/neon_city.png",
+  "modes": ["ctf", "tdm"],
+  "width": 3600,
+  "height": 720,
+  "background": "bg_neon_city",
+  "music": "music_neon",
+
+  "spawns": {
+    "red":  [
+      {"x": 60,  "y": 680}, {"x": 140, "y": 680}, {"x": 220, "y": 680},
+      {"x": 80,  "y": 560}, {"x": 160, "y": 560}
+    ],
+    "blue": [
+      {"x": 3340,"y": 680}, {"x": 3420,"y": 680}, {"x": 3500,"y": 680},
+      {"x": 3360,"y": 560}, {"x": 3440,"y": 560}
+    ]
+  },
+
+  "ctf_flags": {
+    "red":  {"x": 100,  "y": 680, "baseX": 100,  "baseY": 680},
+    "blue": {"x": 3460, "y": 680, "baseX": 3460, "baseY": 680}
+  },
+
+  "platforms": [
+    {"x": 0,    "y": 690, "w": 3600, "h": 30, "type": "solid"},
+
+    {"x": 0,    "y": 0,   "w": 20,  "h": 720, "type": "wall"},
+    {"x": 3580, "y": 0,   "w": 20,  "h": 720, "type": "wall"},
+
+    {"x": 20,   "y": 540, "w": 200, "h": 20, "type": "solid"},
+    {"x": 20,   "y": 380, "w": 160, "h": 20, "type": "solid"},
+    {"x": 20,   "y": 220, "w": 120, "h": 20, "type": "solid"},
+
+    {"x": 280,  "y": 580, "w": 180, "h": 20, "type": "solid"},
+    {"x": 320,  "y": 460, "w": 140, "h": 20, "type": "solid"},
+    {"x": 300,  "y": 320, "w": 160, "h": 20, "type": "solid"},
+    {"x": 260,  "y": 180, "w": 180, "h": 20, "type": "solid"},
+
+    {"x": 560,  "y": 600, "w": 200, "h": 20, "type": "solid"},
+    {"x": 600,  "y": 480, "w": 160, "h": 20, "type": "solid"},
+    {"x": 580,  "y": 360, "w": 140, "h": 20, "type": "solid"},
+    {"x": 620,  "y": 240, "w": 120, "h": 20, "type": "solid"},
+
+    {"x": 900,  "y": 540, "w": 220, "h": 20, "type": "solid"},
+    {"x": 940,  "y": 420, "w": 180, "h": 20, "type": "solid"},
+    {"x": 980,  "y": 300, "w": 140, "h": 20, "type": "solid"},
+    {"x": 960,  "y": 160, "w": 160, "h": 20, "type": "solid"},
+
+    {"x": 1250, "y": 600, "w": 400, "h": 20, "type": "solid"},
+    {"x": 1300, "y": 480, "w": 300, "h": 20, "type": "solid"},
+    {"x": 1350, "y": 360, "w": 200, "h": 20, "type": "solid"},
+    {"x": 1700, "y": 280, "w": 200, "h": 20, "type": "solid"},
+
+    {"x": 1780, "y": 80,  "w": 40,  "h": 20, "type": "solid"},
+
+    {"x": 1950, "y": 360, "w": 200, "h": 20, "type": "solid"},
+    {"x": 1950, "y": 480, "w": 300, "h": 20, "type": "solid"},
+    {"x": 1950, "y": 600, "w": 400, "h": 20, "type": "solid"},
+
+    {"x": 2460, "y": 160, "w": 160, "h": 20, "type": "solid"},
+    {"x": 2480, "y": 300, "w": 140, "h": 20, "type": "solid"},
+    {"x": 2440, "y": 420, "w": 180, "h": 20, "type": "solid"},
+    {"x": 2480, "y": 540, "w": 220, "h": 20, "type": "solid"},
+
+    {"x": 2840, "y": 240, "w": 120, "h": 20, "type": "solid"},
+    {"x": 2860, "y": 360, "w": 140, "h": 20, "type": "solid"},
+    {"x": 2800, "y": 480, "w": 160, "h": 20, "type": "solid"},
+    {"x": 2800, "y": 600, "w": 200, "h": 20, "type": "solid"},
+
+    {"x": 3060, "y": 180, "w": 180, "h": 20, "type": "solid"},
+    {"x": 3040, "y": 320, "w": 160, "h": 20, "type": "solid"},
+    {"x": 3020, "y": 460, "w": 140, "h": 20, "type": "solid"},
+    {"x": 3060, "y": 580, "w": 180, "h": 20, "type": "solid"},
+
+    {"x": 3360, "y": 220, "w": 120, "h": 20, "type": "solid"},
+    {"x": 3380, "y": 380, "w": 160, "h": 20, "type": "solid"},
+    {"x": 3400, "y": 540, "w": 200, "h": 20, "type": "solid"}
+  ],
+
+  "wall_jump_zones": [
+    {"x": 0,    "y": 0, "w": 20,  "h": 720, "side": "right"},
+    {"x": 3580, "y": 0, "w": 20,  "h": 720, "side": "left"},
+    {"x": 1230, "y": 0, "w": 20,  "h": 720, "side": "right"},
+    {"x": 1900, "y": 0, "w": 20,  "h": 720, "side": "left"},
+    {"x": 545,  "y": 100,"w": 20, "h": 500, "side": "right"},
+    {"x": 760,  "y": 100,"w": 20, "h": 500, "side": "left"},
+    {"x": 2840, "y": 100,"w": 20, "h": 500, "side": "right"},
+    {"x": 3060, "y": 100,"w": 20, "h": 500, "side": "left"}
+  ],
+
+  "climb_surfaces": [
+    {"x": 0,    "y": 0, "w": 20, "h": 720},
+    {"x": 3580, "y": 0, "w": 20, "h": 720},
+    {"x": 1230, "y": 0, "w": 20, "h": 720},
+    {"x": 1900, "y": 0, "w": 20, "h": 720}
+  ],
+
+  "special_zones": [
+    {
+      "id": "center_tower_top",
+      "type": "sniper_nest",
+      "x": 1750, "y": 60, "w": 100, "h": 40,
+      "effect": "aim_bonus",
+      "desc": "Kule tepesi — keskin nişancı noktası"
+    },
+    {
+      "id": "red_base",
+      "type": "base",
+      "x": 0, "y": 580, "w": 280, "h": 140,
+      "team": "red"
+    },
+    {
+      "id": "blue_base",
+      "type": "base",
+      "x": 3320, "y": 580, "w": 280, "h": 140,
+      "team": "blue"
+    },
+    {
+      "id": "mid_zone",
+      "type": "high_ground",
+      "x": 1600, "y": 240, "w": 400, "h": 160,
+      "desc": "Şehir merkezi kontrol noktası"
+    }
+  ],
+
+  "interactive_objects": [
+    {
+      "id": "barrel_mid_l", "type": "explosive_barrel",
+      "x": 1300, "y": 572, "w": 32, "h": 48,
+      "hp": 35, "explosion_radius": 110, "explosion_damage": 58,
+      "respawn_time": 28.0
+    },
+    {
+      "id": "barrel_mid_r", "type": "explosive_barrel",
+      "x": 2260, "y": 572, "w": 32, "h": 48,
+      "hp": 35, "explosion_radius": 110, "explosion_damage": 58,
+      "respawn_time": 28.0
+    },
+    {
+      "id": "barrel_tower", "type": "explosive_barrel",
+      "x": 1800, "y": 52, "w": 32, "h": 48,
+      "hp": 20, "explosion_radius": 90, "explosion_damage": 50,
+      "respawn_time": 35.0
+    },
+    {
+      "id": "glass_red_entry", "type": "breakable_glass",
+      "x": 555, "y": 595, "w": 200, "h": 12,
+      "hp": 18, "respawn_time": 22.0
+    },
+    {
+      "id": "glass_blue_entry", "type": "breakable_glass",
+      "x": 2845, "y": 595, "w": 200, "h": 12,
+      "hp": 18, "respawn_time": 22.0
+    },
+    {
+      "id": "glass_center", "type": "breakable_glass",
+      "x": 1350, "y": 355, "w": 200, "h": 12,
+      "hp": 15, "respawn_time": 18.0
+    },
+    {
+      "id": "health_left", "type": "health_pack",
+      "x": 930, "y": 512, "w": 24, "h": 24,
+      "heal": 35, "respawn_time": 18.0
+    },
+    {
+      "id": "health_right", "type": "health_pack",
+      "x": 2640, "y": 512, "w": 24, "h": 24,
+      "heal": 35, "respawn_time": 18.0
+    },
+    {
+      "id": "health_tower", "type": "health_pack",
+      "x": 1785, "y": 52, "w": 24, "h": 24,
+      "heal": 50, "respawn_time": 25.0
+    },
+    {
+      "id": "ammo_center", "type": "ammo_box",
+      "x": 1780, "y": 352, "w": 28, "h": 28,
+      "refill": 1.0, "respawn_time": 12.0
+    },
+    {
+      "id": "ammo_left", "type": "ammo_box",
+      "x": 950, "y": 392, "w": 28, "h": 28,
+      "refill": 0.5, "respawn_time": 15.0
+    },
+    {
+      "id": "ammo_right", "type": "ammo_box",
+      "x": 2600, "y": 392, "w": 28, "h": 28,
+      "refill": 0.5, "respawn_time": 15.0
+    }
+  ]
+}

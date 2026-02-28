@@ -1,0 +1,26 @@
+{
+    "rooftop_ruins": {
+        "play_count": 1,
+        "red_wins": 0,
+        "blue_wins": 0,
+        "draws": 0,
+        "total_kills": 0,
+        "last_played": "2026-02-28 10:35:02"
+    },
+    "shadow_tunnels": {
+        "play_count": 1,
+        "red_wins": 0,
+        "blue_wins": 0,
+        "draws": 0,
+        "total_kills": 0,
+        "last_played": "2026-02-28 13:00:43"
+    },
+    "neon_city": {
+        "play_count": 2,
+        "red_wins": 0,
+        "blue_wins": 0,
+        "draws": 0,
+        "total_kills": 0,
+        "last_played": "2026-02-28 13:53:02"
+    }
+}
